@@ -1,3 +1,11 @@
+<?php
+if (isset($_SESSION["userInfo"])){
+	header("location:index.html");
+}
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -24,7 +32,7 @@
                                     <div class="card-header justify-content-center"><h3 class="fw-light my-2">Login</h3></div>
                                     <div class="card-body">
                                         <!-- Login form-->
-                                        <form>
+                                        <form role="form" action="functions/check.php" method="post">
                                             <!-- Form Group (email address)-->
                                             <div class="mb-3">
                                                 <label class="small mb-1" for="inputEmailAddress">Email</label>
@@ -45,7 +53,7 @@
                                             <!-- Form Group (login box)-->
                                             <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
                                                 <a class="small" href="auth-password-basic.html">Forgot Password?</a>
-                                                <a class="btn btn-primary" href="dashboard-1.html">Login</a>
+                                                <button type="submit" class="btn btn-primary">Login</button>
                                             </div>
                                         </form>
                                     </div>
