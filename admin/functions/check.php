@@ -1,20 +1,20 @@
 <?php
-// $conn = new mysqli("localhost", "root", "", "fady");
-// session_start();
-// extract($_POST);
-// $checkQueryAdmin = "SELECT * FROM admins WHERE username = '$username' AND password = '$password'";
-// $response = $conn -> query($checkQueryAdmin);
-// $status = $response -> num_rows;
+$conn = new mysqli("localhost", "root", "", "nexus");
+session_start();
+extract($_POST);
+$isAdminQuery = "SELECT * FROM users WHERE email = '$email' AND password = '$password'";
+$response = $conn -> query($isAdminQuery);
+$status = $response -> num_rows;
 
-// if ($status == 1){
-//     $_SESSION["adminInfo"] = [
-//         $username,
-//         $password
-//     ];
-//     header("location:../index.php");
-// }
-// else{
-//     header("location:../login.php");
-// }
+if ($status == 1){
+    // 1. Fetch the row data as an associative array
+    $admin = $response->fetch_assoc();
+    
+    // 2. Store only the ID in the session (assuming your column name is 'id')
+    $_SESSION["adminId"] = $admin['id'];
+    header("location:../index.html");
+}
+else{
+    header("location:../login.php");
+}
 ?>
-hello

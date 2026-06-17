@@ -1,10 +1,10 @@
 <?php
-if (isset($_SESSION["userInfo"])){
-	header("location:index.html");
+session_start(); // Make sure session_start() is called before checking $_SESSION
+if (isset($_SESSION["userId"])){
+    header("location:index.html");
+    exit(); // Always use exit() after a header redirect
 }
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -27,30 +27,39 @@ if (isset($_SESSION["userInfo"])){
                     <div class="container-xl px-4">
                         <div class="row justify-content-center">
                             <div class="col-lg-5">
-                                <!-- Basic login form-->
                                 <div class="card shadow-lg border-0 rounded-lg mt-5">
                                     <div class="card-header justify-content-center"><h3 class="fw-light my-2">Login</h3></div>
                                     <div class="card-body">
-                                        <!-- Login form-->
-                                        <form role="form" action="functions/check.php" method="post">
-                                            <!-- Form Group (email address)-->
+                                        <form role="form" id="loginForm" action="functions/check.php" method="post" novalidate>
+                                            
                                             <div class="mb-3">
                                                 <label class="small mb-1" for="inputEmailAddress">Email</label>
-                                                <input class="form-control" id="inputEmailAddress" type="email" placeholder="Enter email address" />
+                                                <input class="form-control" id="inputEmailAddress" name="email" type="email" placeholder="Enter email address" required />
+                                                <div class="invalid-feedback" id="emailFeedback">
+                                                    Please enter a valid email address.
+                                                </div>
                                             </div>
-                                            <!-- Form Group (password)-->
+                                            
                                             <div class="mb-3">
                                                 <label class="small mb-1" for="inputPassword">Password</label>
-                                                <input class="form-control" id="inputPassword" type="password" placeholder="Enter password" />
-                                            </div>
-                                            <!-- Form Group (remember password checkbox)-->
+                                                <input class="form-control" id="inputPassword" name="password" type="password" placeholder="Enter password" required />
+                                                
+                                                <div class="progress mt-2" style="height: 5px;">
+                                                    <div id="strengthBar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                                <small id="strengthText" class="text-muted d-block mt-1" style="font-size: 0.75rem;"></small>
+                                                
+                                                <div class="invalid-feedback" id="passwordFeedback">
+                                                    Password field cannot be empty.
+                                                </div>
+                                            </div>                                            
                                             <div class="mb-3">
                                                 <div class="form-check">
                                                     <input class="form-check-input" id="rememberPasswordCheck" type="checkbox" value="" />
-                                                    <label class="form-check-label" for="rememberPasswordCheck">Remember password</label>
+                                                    <label class="form-check-label" name="isRemembered" for="rememberPasswordCheck">Remember password</label>
                                                 </div>
                                             </div>
-                                            <!-- Form Group (login box)-->
+                                            
                                             <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
                                                 <a class="small" href="auth-password-basic.html">Forgot Password?</a>
                                                 <button type="submit" class="btn btn-primary">Login</button>
@@ -81,7 +90,9 @@ if (isset($_SESSION["userInfo"])){
                 </footer>
             </div>
         </div>
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
         <script src="js/scripts.js"></script>
+        <script src="js/login-validation.js"></script>
     </body>
 </html>
