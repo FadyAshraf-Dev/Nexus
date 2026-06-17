@@ -2,8 +2,8 @@
 $conn = new mysqli("localhost", "root", "", "nexus");
 session_start();
 extract($_POST);
-$isAdminQuery = "SELECT * FROM users WHERE email = '$email' AND password = '$password'";
-$response = $conn -> query($isAdminQuery);
+$getUserQuery = "SELECT * FROM users WHERE email = '$email' AND password = '$password'";
+$response = $conn -> query($getUserQuery);
 $status = $response -> num_rows;
 
 if ($status == 1){
@@ -11,7 +11,7 @@ if ($status == 1){
     $admin = $response->fetch_assoc();
     
     // 2. Store only the ID in the session (assuming your column name is 'id')
-    $_SESSION["adminId"] = $admin['id'];
+    $_SESSION["userId"] = $admin['id'];
     header("location:../index.html");
 }
 else{
