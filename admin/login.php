@@ -1,17 +1,37 @@
 <?php
 require_once '../config/database.php';
-session_start(); // Make sure session_start() is called before checking $_SESSION
-if (isset($_SESSION["userId"]) && isset($_SESSION["userId"])){
-    
-    // 3. Traffic control check: Where should an already logged-in user go?
-    if ($_SESSION["userRole"] == 1 || $_SESSION["userRole"] == 2) {
+
+if (isset($_SESSION["userId"])) {
+    // Traffic control check: Where should an already logged-in user go?
+
+    if ($_SESSION["userRole"] == 3 || $_SESSION["userRole"] == 2) {
         // They are an admin/vendor, kick them straight into the admin dashboard
         redirect("index.php"); 
     } else {
         // They are a customer, bounce them back out to the public storefront
-        // redirect("../index.php");
+        redirect("../index.php");
     }
-}?>
+}
+
+// Map query parameter strings to custom readable alert messages
+$errorMessage = "";
+if (isset($_GET['error'])) {
+    switch ($_GET['error']) {
+        case 'failed_login':
+            $errorMessage = "<strong>Invalid Credentials!</strong> The email or password you entered is incorrect. Please try again.";
+            break;
+        case 'empty_fields':
+            $errorMessage = "<strong>Missing Information!</strong> Please fill in both the email and password fields.";
+            break;
+        case 'logged_out':
+            $errorMessage = "You have been successfully logged out.";
+            break;
+        default:
+            $errorMessage = "An unexpected error occurred. Please try logging in again.";
+            break;
+    }
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -19,8 +39,6 @@ if (isset($_SESSION["userId"]) && isset($_SESSION["userId"])){
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="" />
-        <meta name="author" content="" />
         <title>Login - SB Admin Pro</title>
         <link href="css/styles.css" rel="stylesheet" />
         <link rel="icon" type="image/x-icon" href="assets/img/favicon.png" />
@@ -37,7 +55,19 @@ if (isset($_SESSION["userId"]) && isset($_SESSION["userId"])){
                                 <div class="card shadow-lg border-0 rounded-lg mt-5">
                                     <div class="card-header justify-content-center"><h3 class="fw-light my-2">Login</h3></div>
                                     <div class="card-body">
-                                        <form role="form" id="loginForm" action="functions/check.php" method="post" novalidate>
+                                        
+                                        <?php if (!empty($errorMessage)): ?>
+                                            <?php 
+                                                // Determine background color scheme context based on the parameter type
+                                                $alertClass = ($_GET['error'] === 'logged_out') ? 'alert-success' : 'alert-danger';
+                                            ?>
+                                            <div class="alert <?php echo $alertClass; ?> alert-dismissible fade show" role="alert">
+                                                <?php echo $errorMessage; ?>
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <form role="form" id="loginForm" action="src/auth/check.php" method="post" novalidate>
                                             
                                             <div class="mb-3">
                                                 <label class="small mb-1" for="inputEmailAddress">Email</label>
@@ -48,18 +78,14 @@ if (isset($_SESSION["userId"]) && isset($_SESSION["userId"])){
                                             </div>
                                             
                                             <div class="mb-3">
-                                                <label class="small mb-1" for="inputPassword">Password</label>
-                                                <input class="form-control" id="inputPassword" name="password" type="password" placeholder="Enter password" required />
-                                                
-                                                <div class="progress mt-2" style="height: 5px;">
-                                                    <div id="strengthBar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                                                </div>
-                                                <small id="strengthText" class="text-muted d-block mt-1" style="font-size: 0.75rem;"></small>
-                                                
-                                                <div class="invalid-feedback" id="passwordFeedback">
-                                                    Password field cannot be empty.
-                                                </div>
-                                            </div>                                            
+                                            <label class="small mb-1" for="inputPassword">Password</label>
+                                            <input class="form-control" id="inputPassword" name="password" type="password" placeholder="Enter password" required />
+                                            
+                                            <div class="invalid-feedback" id="passwordFeedback">
+                                                Password must be at least 8 characters long.
+                                            </div>
+                                        </div>                                           
+                                            
                                             <div class="mb-3">
                                                 <div class="form-check">
                                                     <input class="form-check-input" id="rememberPasswordCheck" type="checkbox" value="" />
@@ -86,7 +112,7 @@ if (isset($_SESSION["userId"]) && isset($_SESSION["userId"])){
                 <footer class="footer-admin mt-auto footer-dark">
                     <div class="container-xl px-4">
                         <div class="row">
-                            <div class="col-md-6 small">Copyright &copy; Your Website 2021</div>
+                            <div class="col-md-6 small">Copyright &copy; Your Website 2026</div>
                             <div class="col-md-6 text-md-end small">
                                 <a href="#!">Privacy Policy</a>
                                 &middot;
@@ -101,5 +127,5 @@ if (isset($_SESSION["userId"]) && isset($_SESSION["userId"])){
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
         <script src="js/scripts.js"></script>
         <script src="js/login-validation.js"></script>
-    </body>
+    </body
 </html>
