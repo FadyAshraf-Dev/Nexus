@@ -1,3 +1,10 @@
+<?php
+require_once '../config/database.php';
+require_once 'src/auth/gatekeeper.php';
+
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
     <head>

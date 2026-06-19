@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const passwordFeedback = document.querySelector("#passwordFeedback");
 
     // Baseline configuration constraints
-    const MIN_PASSWORD_LENGTH = 8;
+    const MIN_PASSWORD_LENGTH = 7;
 
     /* ------------------------- Core Validation Rules ------------------------- */
 
