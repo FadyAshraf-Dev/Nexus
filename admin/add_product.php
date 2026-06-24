@@ -1,6 +1,6 @@
 
 <?php
-require_once "../classes/Database.php";
+require_once "../classes/Utils.php";
 require_once '../classes/Gatekeeper.php';
 Gatekeeper::allow([2]);
 $vendor = $_SESSION["user"]["id"];
@@ -325,9 +325,10 @@ $userRole = $_SESSION["user"]["role_id"];
                                     <div class="card-body">
                                         <!-- Single form wraps the whole wizard so one submit posts every step's fields together-->
                                         <form id="addProductForm" action="add-product-handler.php" method="POST" enctype="multipart/form-data" novalidate>
+                                            <input type="hidden" name="csrf_token" value="<?= Utils::getCSRFToken(); ?>">
                                             <div class="tab-content" id="productWizardTabContent">
                                                 <!-- ============================================= -->
-                                                <!-- STEP 1: BASIC INFORMATION                      -->
+                                                <!-- STEP 1: BASIC INFORMATION                     -->
                                                 <!-- ============================================= -->
                                                 <div class="tab-pane py-5 py-xl-8 fade show active" id="step1" role="tabpanel" aria-labelledby="step1-tab">
                                                     <div class="row justify-content-center">

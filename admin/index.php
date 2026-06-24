@@ -1,5 +1,5 @@
 <?php
-require_once "../classes/Database.php";
+
 require_once '../classes/Gatekeeper.php';
 Gatekeeper::allow([3,2]);
 $userRole = $_SESSION["user"]["role_id"];

@@ -1,6 +1,6 @@
 <?php
-require_once '../classes/Database.php';
 require_once '../classes/Utils.php';
+require_once '../classes/Database.php';
 if(session_status() == PHP_SESSION_NONE ){
     session_start();
 }
@@ -10,10 +10,10 @@ if (isset($_SESSION["user"])) {
     $userRole = $_SESSION["user"]["role_id"];
     if ($userRole == 3 || $userRole == 2) {
         // They are an admin/vendor, kick them straight into the admin dashboard
-        Utils::redirect("index.php"); 
+        Utils::redirect(ADMIN_URL . "index.php"); 
     } else {
         // They are a customer, bounce them back out to the public storefront
-        Utils::redirect("../index.php");
+        Utils::redirect(BASE_URL . "index.php");
     }
 }
 
@@ -75,7 +75,7 @@ if (isset($_GET['error'])) {
                                             
                                             <div class="mb-3">
                                                 <label class="small mb-1" for="inputEmailAddress">Email</label>
-                                                <input class="form-control" id="inputEmailAddress" name="email" type="email" placeholder="Enter email address" required />
+                                                <input class="form-control" id="inputEmailAddress" name="email" type="email" placeholder="Enter email address" autocomplete="email"/>
                                                 <div class="invalid-feedback" id="emailFeedback">
                                                     Please enter a valid email address.
                                                 </div>
@@ -83,7 +83,7 @@ if (isset($_GET['error'])) {
                                             
                                             <div class="mb-3">
                                             <label class="small mb-1" for="inputPassword">Password</label>
-                                            <input class="form-control" id="inputPassword" name="password" type="password" placeholder="Enter password" required />
+                                            <input class="form-control" id="inputPassword" name="password" type="password" placeholder="Enter password" autocomplete="current-password"/>
                                             
                                             <div class="invalid-feedback" id="passwordFeedback">
                                                 Password must be at least 8 characters long.
