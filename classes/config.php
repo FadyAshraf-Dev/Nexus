@@ -1,13 +1,25 @@
 <?php
-// classes/config.php
 
-// 1. Get the protocol (http or https)
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
+declare(strict_types=1);
 
-// 2. Get the host name (e.g., localhost)
-$host = $_SERVER['HTTP_HOST'];
+final class Config
+{
+    private static array $config = [];
 
-// 3. Define the project root directory URL dynamically
-// Adjust 'nexus' if your root folder name changes
-define('BASE_URL', $protocol . $host . '/nexus/');
-define('ADMIN_URL', BASE_URL . 'admin/');
+    public static function load(): void
+    {
+        self::$config = [
+            'app' => require __DIR__ . '/../config/app.php',
+            'database' => require __DIR__ . '/../config/database.php',
+        ];
+    }
+
+    public static function app(string $key): mixed
+    {
+        return self::$config['app'][$key] ?? null;
+    }
+    public static function database(string $key): mixed
+    {
+        return self::$config['database'][$key] ?? null;
+    }
+}
