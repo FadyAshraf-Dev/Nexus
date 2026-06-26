@@ -1,113 +1,211 @@
 <?php
 
-class Validator {
+declare(strict_types=1);
+
+class Validator
+{
     private array $data;
     private array $errors = [];
 
-    public function __construct(array $sourceData) {
-        // Automatically sanitize basic string layers against XSS on creation
-        $this->data = array_map(function($value) {
-            return is_string($value) ? trim(htmlspecialchars($value, ENT_QUOTES, 'UTF-8')) : $value;
-        }, $sourceData);
+    public function __construct(array $sourceData)
+    {
+        $this->data = array_map(
+            fn ($value) => is_string($value) ? trim($value) : $value,
+            $sourceData
+        );
     }
 
     /**
-     * The Upgraded Rule Interpreter Matrix
-     * @param array $rules Maps field names to pipe-separated validation strings
+     * Validate the supplied data against the provided rules.
      */
-    public function validate(array $rules): self {
+    public function validate(array $rules): self
+    {
         foreach ($rules as $field => $ruleString) {
-            $individualRules = explode('|', $ruleString);
+
             $value = $this->data[$field] ?? null;
 
-            foreach ($individualRules as $rule) {
-                $param = null;
-                if (strpos($rule, ':') !== false) {
-                    list($rule, $param) = explode(':', $rule);
+            foreach (explode('|', $ruleString) as $rule) {
+
+                $parameter = null;
+
+                if (str_contains($rule, ':')) {
+                    [$rule, $parameter] = explode(':', $rule, 2);
                 }
 
-                // ⚡ Dynamic Parameter Resolution Engine
-                // Intercepts and parses literal '$_POST["key"]' strings from single quotes
-                $resolvedParam = $param;
-                if ($param !== null) {
-                    if (preg_match('/\$_POST\[["\'](.+?)["\']\]/', $param, $matches)) {
-                        $targetKey = $matches[1];
-                        $resolvedParam = $this->data[$targetKey] ?? 0;
-                    } elseif (isset($this->data[$param])) {
-                        $resolvedParam = $this->data[$param];
-                    }
+                $method = $this->resolveRuleMethod($rule);
+
+                if (!method_exists($this, $method)) {
+                    continue;
                 }
 
-                // Execute the corresponding smart validation check
-                switch ($rule) {
-                    case 'required':
-                        if ($value === null || $value === '') {
-                            $this->errors[$field] = ucfirst(str_replace('_', ' ', $field)) . " is required.";
-                        }
-                        break;
+                $this->$method(
+                    $field,
+                    $value,
+                    $this->resolveParameter($parameter)
+                );
 
-                    case 'numeric': //
-                        if ($value !== null && $value !== '' && !is_numeric($value)) {
-                            $this->errors[$field] = ucfirst(str_replace('_', ' ', $field)) . " must be a valid number.";
-                        }
-                        break;
-
-                    case 'integar': // 🔢 Custom rule matching your exact structural spelling
-                        if ($value !== null && $value !== '' && (!is_numeric($value) || (int)$value != $value)) {
-                            $this->errors[$field] = ucfirst(str_replace('_', ' ', $field)) . " must be a whole integer number.";
-                        }
-                        break;
-
-                    case 'min': //
-                        if ($value !== null && $value !== '' && is_numeric($value) && (float)$value < (float)$resolvedParam) {
-                            $this->errors[$field] = ucfirst(str_replace('_', ' ', $field)) . " cannot be less than {$resolvedParam}.";
-                        }
-                        break;
-
-                    case 'max': // 📈 Custom upper bounds limit rule
-                        if ($value !== null && $value !== '' && is_numeric($value) && (float)$value > (float)$resolvedParam) {
-                            $this->errors[$field] = ucfirst(str_replace('_', ' ', $field)) . " cannot exceed {$resolvedParam}.";
-                        }
-                        break;
-
-                    case 'min_len': // 📏 String character minimum bounds check
-                        if ($value !== null && $value !== '' && mb_strlen((string)$value) < (int)$resolvedParam) {
-                            $this->errors[$field] = ucfirst(str_replace('_', ' ', $field)) . " must be at least {$resolvedParam} characters.";
-                        }
-                        break;
-
-                    case 'max_len': // 📉 String character maximum bounds check
-                        if ($value !== null && $value !== '' && mb_strlen((string)$value) > (int)$resolvedParam) {
-                            $this->errors[$field] = ucfirst(str_replace('_', ' ', $field)) . " cannot exceed {$resolvedParam} characters.";
-                        }
-                        break;
-
-                    case 'in': //
-                        $allowedOptions = explode(',', $resolvedParam);
-                        if ($value !== null && $value !== '' && !in_array($value, $allowedOptions)) {
-                            $this->errors[$field] = "Invalid selection for " . str_replace('_', ' ', $field) . ".";
-                        }
-                        break;
-                }
-
-                // If a field already has an error, stop checking further rules for it
                 if (isset($this->errors[$field])) {
                     break;
                 }
             }
         }
+
         return $this;
     }
 
-    public function fails(): bool { //
+    public function fails(): bool
+    {
         return !empty($this->errors);
     }
 
-    public function getErrors(): array { //
+    public function passes(): bool
+    {
+        return empty($this->errors);
+    }
+
+    public function errors(): array
+    {
         return $this->errors;
     }
 
-    public function getValidated(): array { //
+    public function validated(): array
+    {
         return $this->data;
     }
+
+    /**
+     * -----------------------------
+     * Validation Rules
+     * -----------------------------
+     */
+
+    private function validateRequired(string $field, mixed $value): void
+    {
+        if ($value === null || $value === '') {
+            $this->errors[$field] = $this->label($field) . ' is required.';
+        }
+    }
+
+    private function validateNumeric(string $field, mixed $value): void
+    {
+        if (
+            $value !== null &&
+            $value !== '' &&
+            !is_numeric($value)
+        ) {
+            $this->errors[$field] = $this->label($field) . ' must be a valid number.';
+        }
+    }
+
+    private function validateInteger(string $field, mixed $value): void
+    {
+        if (
+            $value !== null &&
+            $value !== '' &&
+            (!is_numeric($value) || (int) $value != $value)
+        ) {
+            $this->errors[$field] = $this->label($field) . ' must be a whole integer.';
+        }
+    }
+
+    private function validateMin(string $field, mixed $value, mixed $parameter): void
+    {
+        if (
+            $value !== null &&
+            $value !== '' &&
+            is_numeric($value) &&
+            (float)$value < (float)$parameter
+        ) {
+            $this->errors[$field] = $this->label($field) . " cannot be less than {$parameter}.";
+        }
+    }
+
+    private function validateMax(string $field, mixed $value, mixed $parameter): void
+    {
+        if (
+            $value !== null &&
+            $value !== '' &&
+            is_numeric($value) &&
+            (float)$value > (float)$parameter
+        ) {
+            $this->errors[$field] = $this->label($field) . " cannot exceed {$parameter}.";
+        }
+    }
+
+    private function validateMinLen(string $field, mixed $value, mixed $parameter): void
+    {
+        if (
+            $value !== null &&
+            $value !== '' &&
+            mb_strlen((string)$value) < (int)$parameter
+        ) {
+            $this->errors[$field] = $this->label($field) . " must be at least {$parameter} characters.";
+        }
+    }
+
+    private function validateMaxLen(string $field, mixed $value, mixed $parameter): void
+    {
+        if (
+            $value !== null &&
+            $value !== '' &&
+            mb_strlen((string)$value) > (int)$parameter
+        ) {
+            $this->errors[$field] = $this->label($field) . " cannot exceed {$parameter} characters.";
+        }
+    }
+
+    private function validateIn(string $field, mixed $value, mixed $parameter): void
+    {
+        $allowed = explode(',', (string)$parameter);
+
+        if (
+            $value !== null &&
+            $value !== '' &&
+            !in_array($value, $allowed, true)
+        ) {
+            $this->errors[$field] = "Invalid selection for {$this->label($field)}.";
+        }
+    }
+    private function validateEmail(string $field, mixed $value): void
+    {
+        if (
+            $value !== null &&
+            $value !== '' &&
+            !filter_var($value, FILTER_VALIDATE_EMAIL)
+        ) {
+            $this->errors[$field] =
+                $this->label($field) . ' must be a valid email address.';
+        }
+    }
+    /**
+     * -----------------------------
+     * Helpers
+     * -----------------------------
+     */
+
+    private function resolveParameter(?string $parameter): mixed
+    {
+        if ($parameter === null) {
+            return null;
+        }
+
+        return $this->data[$parameter] ?? $parameter;
+    }
+
+    private function resolveRuleMethod(string $rule): string
+    {
+        return 'validate' . str_replace(
+            ' ',
+            '',
+            ucwords(str_replace('_', ' ', $rule))
+        );
+    }
+
+    private function label(string $field): string
+    {
+        return ucfirst(
+            str_replace('_', ' ', $field)
+        );
+    }
+
 }
