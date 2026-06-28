@@ -30,6 +30,10 @@ return [
         'per_page' => 15,
 
     ],
-    'base_url'  => '/nexus/',
-    'admin_url' => '/nexus/admin/',
+
+    // URLs
+    'base_url'   => '/',
+    'admin_url'  => '/admin/',
+    'uploads_url'=> '/uploads/',
+
 ];

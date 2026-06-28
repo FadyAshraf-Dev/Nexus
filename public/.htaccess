@@ -1,0 +1,17 @@
+Options -Indexes
+
+DirectoryIndex index.php
+
+RewriteEngine On
+
+# --------------------------------------------------------
+# Don't rewrite existing files or directories
+# --------------------------------------------------------
+
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# --------------------------------------------------------
+# Future rewrite rules go here
+# --------------------------------------------------------
