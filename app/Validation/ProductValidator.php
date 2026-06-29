@@ -12,7 +12,7 @@ final class ProductValidator
                 => 'required|min_len:3|max_len:150',
 
             'short_description'
-                => 'required|min_len:10|max_len:255',
+                => 'required|min_len:10|max_len:170',
 
             'full_description'
                 => 'required|min_len:20',

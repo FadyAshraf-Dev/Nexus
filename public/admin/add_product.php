@@ -129,7 +129,7 @@ $categories = $categoryRepository->findAll();
                                                 class="form-control <?= isset($errors['product_name']) ? ' is-invalid' : '' ?>"
                                                 id="inputProductName" name="product_name" type="text"
                                                 value="<?= old('product_name') ?>"
-                                                placeholder="e.g. Wireless Mechanical Keyboard" minlength="10"
+                                                placeholder="e.g. Wireless Mechanical Keyboard" minlength="3"
                                                 maxlength="150" required />
                                              <?= error('product_name') ?>
                                           </div>
@@ -140,7 +140,7 @@ $categories = $categoryRepository->findAll();
                                              <input
                                                 class="form-control <?= isset($errors['short_description']) ? ' is-invalid' : '' ?>"
                                                 id="inputShortDescription" name="short_description"
-                                                value="<?= old('short_description') ?>" type="text" minlength="30"
+                                                value="<?= old('short_description') ?>" type="text" minlength="10"
                                                 maxlength="170" required
                                                 placeholder="A one-line summary shown in product listings" />
                                              <?= error('short_description') ?>
@@ -153,7 +153,7 @@ $categories = $categoryRepository->findAll();
                                                 class="form-control <?= isset($errors['full_description']) ? ' is-invalid' : '' ?>"
                                                 id="inputFullDescription" name="full_description" rows="5"
                                                 placeholder="Detailed product description, features, specifications..."
-                                                minlength="50" required><?= old('full_description') ?></textarea>
+                                                minlength="20" required><?= old('full_description') ?></textarea>
                                              <?= error('full_description') ?>
                                           </div>
 
@@ -184,7 +184,7 @@ $categories = $categoryRepository->findAll();
                                                 <input
                                                    class="form-control <?= isset($errors['brand']) ? ' is-invalid' : '' ?>"
                                                    id="inputBrand" name="brand" type="text"
-                                                   placeholder="Enter the brand name" value="<?= old('brand') ?>" />
+                                                   placeholder="Enter the brand name" maxlength="100" value="<?= old('brand') ?>" />
                                                 <?= error('brand') ?>
                                              </div>
                                           </div>
