@@ -1,39 +1,32 @@
 const ELEMENTS = {
+  form: "addProductForm",
 
-    form: "addProductForm",
+  costPrice: "inputCostPrice",
+  sellingPrice: "inputSellingPrice",
 
-    costPrice: "inputCostPrice",
-    sellingPrice: "inputSellingPrice",
+  stockQuantity: "inputStockQuantity",
+  lowStock: "inputLowStockThreshold",
 
-    stockQuantity: "inputStockQuantity",
-    lowStock: "inputLowStockThreshold",
-
-    discountType: "selectDiscountType",
-    discountValue: "inputDiscountValue"
-
+  discountType: "selectDiscountType",
+  discountValue: "inputDiscountValue",
 };
 
-document.addEventListener(
-    "DOMContentLoaded",
-    initializePage
-);
+document.addEventListener("DOMContentLoaded", initializePage);
 
 function initializePage() {
+  const dom = createDom(ELEMENTS);
 
-    const dom = createDom(ELEMENTS);
+  initializeFormValidation(dom.form);
 
-    initializeFormValidation(dom.form);
+  initializeWizardNavigation();
 
-    initializeWizardNavigation();
+  initializeScrollBehavior();
 
-    initializeScrollBehavior();
+  initializeDiscountToggle(dom);
 
-    initializeDiscountToggle(dom);
+  initializeDynamicConstraints(dom);
 
-    initializeDynamicConstraints(dom);
-
-    initializeWizardValidation();
-
+  initializeWizardValidation();
 }
 
 /* =====================================================
@@ -41,39 +34,30 @@ function initializePage() {
 ===================================================== */
 
 function initializeWizardValidation() {
+  document.querySelectorAll(".btn-wizard-next").forEach(function (button) {
+    button.addEventListener(
+      "click",
+      function (event) {
+        startValidation();
 
-    document.querySelectorAll(".btn-wizard-next")
-        .forEach(function (button) {
+        const currentStep = button.closest(".tab-pane");
 
-            button.addEventListener("click", function (event) {
-
-                const currentStep =
-                    button.closest(".tab-pane");
-
-                if (!validateContainer(currentStep)) {
-
-                    event.stopImmediatePropagation();
-
-                }
-
-            }, true);
-
-        });
-
-    const form =
-        document.getElementById("addProductForm");
-
-    form.addEventListener("submit", function (event) {
-
-        const lastStep =
-            document.getElementById("step4");
-
-        if (!validateContainer(lastStep)) {
-
-            event.preventDefault();
-
+        if (!validateContainer(currentStep)) {
+          event.stopImmediatePropagation();
         }
+      },
+      true,
+    );
+  });
 
-    });
+  const form = document.getElementById("addProductForm");
 
+  form.addEventListener("submit", function (event) {
+    startValidation();
+    const lastStep = document.getElementById("step4");
+
+    if (!validateContainer(lastStep)) {
+      event.preventDefault();
+    }
+  });
 }
