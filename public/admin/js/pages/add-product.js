@@ -34,6 +34,7 @@ function initializePage() {
 ===================================================== */
 
 function initializeWizardValidation() {
+  const steps = Array.from(document.querySelectorAll(".tab-pane"));
   document.querySelectorAll(".btn-wizard-next").forEach(function (button) {
     button.addEventListener(
       "click",
@@ -60,4 +61,34 @@ function initializeWizardValidation() {
       event.preventDefault();
     }
   });
+  document
+    .querySelectorAll("#productWizardTab .nav-link")
+    .forEach(function (tab) {
+      tab.addEventListener("show.bs.tab", function (event) {
+        startValidation();
+
+        const currentStep = document.querySelector(".tab-pane.active");
+
+        const currentIndex = steps.indexOf(currentStep);
+
+        const targetStep = document.querySelector(
+          event.target.getAttribute("href"),
+        );
+
+        const targetIndex = steps.indexOf(targetStep);
+
+        // Going backwards? Always allow.
+        if (targetIndex <= currentIndex) {
+          return;
+        }
+
+        // Validate every skipped step.
+        for (let i = currentIndex; i < targetIndex; i++) {
+          if (!validateContainer(steps[i])) {
+            event.preventDefault();
+            return;
+          }
+        }
+      });
+    });
 }
