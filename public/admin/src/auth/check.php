@@ -16,7 +16,9 @@ $validator = (new Validator($_POST))->validate([
 ]);
 
 if ($validator->fails()) {
-    Response::redirectAdmin('login.php?error=empty_fields');
+    Flash::error("Please Enter The Required Fields");
+
+    Response::redirectAdmin('login.php');
 }
 
 $data = $validator->validated();
@@ -39,7 +41,9 @@ try {
     // 5. Check if a user was found and verify their credentials
     // (If you are using plain text passwords for now, keep this. If using password_hash, use password_verify)
     if (!$user || $password !== $user['password']) {
-        Response::redirectAdmin("login.php?error=failed_login");
+        Flash::error("Invalid email or password.");
+
+        Response::redirectAdmin("login.php");
     }
     // 🛡️ Erases the old session ID file on the server and issues a brand new random ID token to the browser
     session_regenerate_id(true);
@@ -61,6 +65,8 @@ try {
         )
     ) {
         // Authorized Dashboard operators (Admin / Vendor)
+        Flash::success("Logged In Successfully");
+
         Response::redirectAdmin("index.php");
     } else {
         // Normal consumer client identity -> route to general public catalog

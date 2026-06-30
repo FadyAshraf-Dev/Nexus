@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
-// ini_set('display_errors', 1);
-// error_reporting(E_ALL);
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 require_once dirname(__DIR__, 2) . '/bootstrap/bootstrap.php';
 if (isset($_SESSION["user"])) {
     // Traffic control check: Where should an already logged-in user go?
@@ -16,24 +16,6 @@ if (isset($_SESSION["user"])) {
     }
 }
 
-// Map query parameter strings to custom readable alert messages
-$errorMessage = "";
-if (isset($_GET['error'])) {
-    switch ($_GET['error']) {
-        case 'failed_login':
-            $errorMessage = "<strong>Invalid Credentials!</strong> The email or password you entered is incorrect. Please try again.";
-            break;
-        case 'empty_fields':
-            $errorMessage = "<strong>Missing Information!</strong> Please fill in both the email and password fields.";
-            break;
-        case 'logged_out':
-            $errorMessage = "You have been successfully logged out.";
-            break;
-        default:
-            $errorMessage = "An unexpected error occurred. Please try logging in again.";
-            break;
-    }
-}
 require_once 'includes/head.php';
 
 ?>
@@ -51,19 +33,7 @@ require_once 'includes/head.php';
                                 </div>
                                 <div class="card-body">
 
-                                    <?php if (!empty($errorMessage)): ?>
-                                        <?php
-                                        // Determine background color scheme context based on the parameter type
-                                        $alertClass = ($_GET['error'] === 'logged_out') ? 'alert-success' : 'alert-danger';
-                                        ?>
-                                        <div class="alert <?php echo $alertClass; ?> alert-dismissible fade show"
-                                            role="alert">
-                                            <?php echo $errorMessage; ?>
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                                aria-label="Close"></button>
-                                        </div>
-                                    <?php endif; ?>
-
+                                    <?= Flash::display()?>
                                     <form role="form" id="loginForm" action="src/auth/check.php" method="post">
                                         <input type="hidden" name="csrf_token" value="<?= CSRF::token(); ?>">
 
@@ -120,17 +90,6 @@ require_once 'includes/head.php';
     </div>
 
     <?php require_once 'includes/scripts.php'; ?>
-    <script>
-
-        document.addEventListener("DOMContentLoaded", function () {
-
-            initializeFormValidation(
-                document.getElementById("loginForm")
-            );
-
-        });
-
-    </script>
 </body>
 
 </html>

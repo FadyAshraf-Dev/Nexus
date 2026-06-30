@@ -36,17 +36,17 @@ function initializePage() {
 
   initializeWizardValidation(app);
   initializeImageGallery(app);
-  document.querySelectorAll("[required]").forEach(function(field) {
+//   document.querySelectorAll("[required]").forEach(function(field) {
 
-    const label = document.querySelector(
-        `label[for="${field.id}"]`
-    );
+//     const label = document.querySelector(
+//         `label[for="${field.id}"]`
+//     );
 
-    if (label) {
-        label.classList.add("required");
-    }
+//     if (label) {
+//         label.classList.add("required");
+//     }
 
-});
+// });
 }
 
 /* =====================================================

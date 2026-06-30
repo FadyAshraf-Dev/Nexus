@@ -11,7 +11,7 @@ spl_autoload_register(function (string $class): void {
         ROOT_PATH . '/app/Helpers/',
         ROOT_PATH . '/app/Validation/',
         ROOT_PATH . '/app/Repositories/',
-        ROOT_PATH . '/app/Repositories/contracts/',
+        // ROOT_PATH . '/app/Repositories/contracts/',
         ROOT_PATH . '/app/Services/',
         ROOT_PATH . '/app/Logging/',
     ];
