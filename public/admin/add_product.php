@@ -20,8 +20,8 @@ function error(string $key): string
       . Html::escape($message)
       . '</div>';
 }
-$userId = Gatekeeper::id();
-$userRole = Gatekeeper::roleId();
+$userId = Session::id();
+$userRole = Session::roleId();
 require 'includes/head.php';
 $pdo = Database::connection();
 

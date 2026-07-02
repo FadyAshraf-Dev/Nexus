@@ -6,7 +6,7 @@ require_once dirname(__DIR__, 5) . '/bootstrap/bootstrap.php';
 
 CSRF::verify();
 
-$_POST['vendor_id'] = Gatekeeper::id();
+$_POST['vendor_id'] = Session::id();
 
 $validator = ProductValidator::validate($_POST);
 if ($message = ProductValidator::validateImageCount($_FILES['images'])) {

@@ -45,18 +45,7 @@ try {
 
         Response::redirectAdmin("login.php");
     }
-    // 🛡️ Erases the old session ID file on the server and issues a brand new random ID token to the browser
-    session_regenerate_id(true);
-    // Save authorization identity properties to active session arrays (exclude the password!)
-    $_SESSION["user"] = [
-        'id' => $user['id'],
-        'email' => $user['email'],
-        // 'first_name' => $user['first_name'],
-        // 'last_name'  => $user['last_name'],
-        'role_id' => $user['role_id']
-    ];
-
-    // Traffic Control Routing Layer
+    Session::login($user);  
     if (
         in_array(
             $user['role_id'],
@@ -65,8 +54,6 @@ try {
         )
     ) {
         // Authorized Dashboard operators (Admin / Vendor)
-        Flash::success("Logged In Successfully");
-
         Response::redirectAdmin("index.php");
     } else {
         // Normal consumer client identity -> route to general public catalog
@@ -76,11 +63,8 @@ try {
 
 } catch (Throwable $e) {
 
-    // error_log($e);
-
-    // Response::redirectAdmin(
-    //     'login.php?error=server_error'
-    // );
-    die($e);
+    error_log($e);
+    Flash::success("Servers Are Currently Down.");
+    Response::redirectAdmin('login.php');
 }
 

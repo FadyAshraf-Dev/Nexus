@@ -24,7 +24,20 @@ class Session
             session_start();
         }
     }
-    public static function destroy(): void
+    public static function login(array $user): void
+    {
+        self::start();
+
+        self::regenerate();
+
+        $_SESSION['user'] = [
+            'id' => (int) $user['id'],
+            'email' => $user['email'],
+            'role_id' => (int) $user['role_id'],
+        ];
+    }
+
+    public static function logout(): void
     {
         session_unset();
 
@@ -48,6 +61,38 @@ class Session
         self::start();
 
         // Give it a fresh session ID
+        self::regenerate();
+
+    }
+    public static function check(): bool
+    {
+        return isset($_SESSION['user'])
+            && is_array($_SESSION['user']);
+    }
+
+    public static function user(): ?array
+    {
+        return $_SESSION['user'] ?? null;
+    }
+
+    public static function id(): ?int
+    {
+        return self::user()["id"] ?? null;
+
+    }
+
+    public static function roleId(): ?int
+    {
+        return self::user()["role_id"] ?? null;
+
+    }
+
+    public static function guest(): bool
+    {
+        return !self::check();
+    }
+    public static function regenerate(): void
+    {
         session_regenerate_id(true);
     }
 }
