@@ -61,7 +61,7 @@ require_once 'includes/head.php';
 
                                         <div class="mb-3">
                                             <div class="form-check">
-                                                <input class="form-check-input" id="rememberPasswordCheck"
+                                                <input class="form-check-input" id="rememberPasswordCheck" name="remember_me"
                                                     type="checkbox" value="1" />
                                                 <label class="form-check-label" name="isRemembered"
                                                     for="rememberPasswordCheck">Remember password</label>
