@@ -7,7 +7,7 @@ final class Asset
     {
         $physicalPath = dirname(__DIR__) . '/public/admin/' . ltrim($relativePath, '/');
 
-        $url = rtrim(Config::app('admin_url'), '/') . '/' . ltrim($relativePath, '/');
+        $url = rtrim(Config::app('urls.admin_url'), '/') . '/' . ltrim($relativePath, '/');
 
         if (file_exists($physicalPath)) {
             return $url . '?v=' . filemtime($physicalPath);
@@ -20,7 +20,7 @@ final class Asset
     {
         $physicalPath = dirname(__DIR__) . '/public/' . ltrim($relativePath, '/');
 
-        $url = rtrim(Config::app('base_url'), '/') . '/' . ltrim($relativePath, '/');
+        $url = rtrim(Config::app('urls.base_url'), '/') . '/' . ltrim($relativePath, '/');
 
         if (file_exists($physicalPath)) {
             return $url . '?v=' . filemtime($physicalPath);

@@ -13,7 +13,6 @@ return [
         'product_uploads' => dirname(__DIR__) . '/public/uploads/products/',
 
     ],
-
     'allowed_image_types' => [
 
         'image/jpeg',
@@ -22,8 +21,12 @@ return [
         'image/avif',
 
     ],
+    'cookies' => [
+        'name' => 'remember_me',
+        'duration' => "+30days",
+    ],
 
-    'max_image_size' => 5 * 1024 * 1024,
+    'max_image_size' => 2 * 1024 * 1024,
 
     'pagination' => [
 
@@ -31,9 +34,9 @@ return [
 
     ],
 
-    // URLs
-    'base_url'   => '/',
-    'admin_url'  => '/admin/',
-    'uploads_url'=> '/uploads/',
-
+    'urls' => [
+        'base_url' => '/',
+        'admin_url' => '/admin/',
+        'product_uploads' => '/uploads/products/',
+    ],
 ];
