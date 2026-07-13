@@ -414,15 +414,16 @@ $categories = $categoryRepository->findAll();
    <?php require 'includes/scripts.php'; ?>
 
    <script src="<?= Asset::admin('js/shared/validation.js') ?>"></script>
-   <script src="<?= Asset::admin('js/shared/wizard.js') ?>"></script>
-   <script src="<?= Asset::admin('js/shared/wizardValidation.js') ?>"></script>
-   <script src="<?= Asset::admin('js/shared/discount.js') ?>"></script>
-   <script src="<?= Asset::admin('js/shared/constraints.js') ?>"></script>
-   <script src="<?= Asset::admin('js/shared/dom.js') ?>"></script>
+   <script src="<?= Asset::admin('js/shared/wizard/wizard.js') ?>"></script>
+   <script src="<?= Asset::admin('js/shared/wizard/wizardValidation.js') ?>"></script>
+   <script src="<?= Asset::admin('js/shared/products/discount.js') ?>"></script>
+   <script src="<?= Asset::admin('js/shared/products/constraints.js') ?>"></script>
+   <script src="<?= Asset::admin('js/shared/elements.js') ?>"></script>
    <script src="<?= Asset::admin('js/shared/feedback.js') ?>"></script>
-   <script src="<?= Asset::admin('js/shared/imageGallery.js') ?>"></script>
+   <script src="<?= Asset::admin('js/shared/products/imageGallery.js') ?>"></script>
+   <script src="<?= Asset::admin('js/shared/products/imageValidation.js') ?>"></script>
 
-   <script src="<?= Asset::admin('js/pages/add-product.js') ?>"></script>
+   <script src="<?= Asset::admin('js/pages/products/add-product.js') ?>"></script>
    <script>
 
    </script>
