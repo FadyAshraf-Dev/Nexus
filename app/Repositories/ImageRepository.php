@@ -37,7 +37,7 @@ final class ImageRepository extends Repository
         $statement->execute([
             'id' => $imageId,
         ]);
-        return $statement->rowCount() > 0;
+        return $statement->rowCount() === 1;
 
     }
 

@@ -4,6 +4,37 @@ declare(strict_types=1);
 
 final class ProductValidator
 {
+    public const DEFAULT_PER_PAGE = 10;
+
+    public const ALLOWED_PAGE_SIZES = [
+        10,
+        25,
+        50,
+        100,
+    ];
+
+    public const ALLOWED_STATUSES = [
+        'active',
+        'inactive',
+    ];
+
+    public const ALLOWED_SORT_COLUMNS = [
+        'created_at',
+        'product_name',
+        'selling_price',
+        'stock_quantity',
+        'status',
+    ];
+
+    public const ALLOWED_SORT_DIRECTIONS = [
+        'ASC',
+        'DESC',
+    ];
+
+    public const DEFAULT_SORT_BY = 'created_at';
+
+    public const DEFAULT_SORT_DIRECTION = 'DESC';
+
     public static function validate(array $data): Validator
     {
         $validator = (new Validator($data))->validate([
@@ -54,7 +85,64 @@ final class ProductValidator
 
         return $validator;
     }
+    public static function validateListing(array $input): Validator
+    {
+        $validator = (new Validator($input))->validate([
+            'page' => 'nullable|integer|min:1',
 
+            'per_page' => 'nullable|integer|in:' .
+                implode(',', self::ALLOWED_PAGE_SIZES),
+
+            'search' => 'nullable|max_len:255',
+
+            'category_id' => 'nullable|integer|exists:categories,id',
+
+            'status' => 'nullable|in:' .
+                implode(',', self::ALLOWED_STATUSES),
+
+            'sort_by' => 'nullable|in:' .
+                implode(',', self::ALLOWED_SORT_COLUMNS),
+
+            'sort_direction' => 'nullable|in:' .
+                implode(',', self::ALLOWED_SORT_DIRECTIONS),
+        ]);
+
+        if ($validator->fails()) {
+            return $validator;
+        }
+
+        $data = $validator->validated();
+
+        $validator->setValidated([
+            'page' => isset($data['page'])
+                ? (int) $data['page']
+                : 1,
+
+            'per_page' => isset($data['per_page'])
+                ? (int) $data['per_page']
+                : self::DEFAULT_PER_PAGE,
+
+            'search' => isset($data['search']) && $data['search'] !== ''
+                ? $data['search']
+                : null,
+
+            'category_id' => isset($data['category_id']) && $data['category_id'] !== ''
+                ? (int) $data['category_id']
+                : null,
+
+            'status' => $data['status'] ?? null,
+
+            'sort_by' => $data['sort_by']
+                ?? self::DEFAULT_SORT_BY,
+
+            'sort_direction' => strtoupper(
+                $data['sort_direction']
+                ?? self::DEFAULT_SORT_DIRECTION
+            ),
+        ]);
+
+        return $validator;
+    }
     private static function validateDiscount(
         Validator $validator,
         array $data

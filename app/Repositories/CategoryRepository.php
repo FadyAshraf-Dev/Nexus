@@ -60,7 +60,7 @@ final class CategoryRepository extends Repository
             'id' => $id
         ]);
 
-        return $statement->rowCount() > 0;
+        return $statement->rowCount() === 1;
     }
 
     public function findById(int $id): ?array

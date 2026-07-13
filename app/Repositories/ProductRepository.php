@@ -42,7 +42,6 @@ final class ProductRepository extends Repository
 
         $statement = $this->prepare($sql);
 
-        print_r($data);
 
         $statement->execute([
             'product_name' => $data['product_name'],
@@ -72,7 +71,9 @@ final class ProductRepository extends Repository
         $sql = "
         UPDATE products
         SET deleted_at = NOW()
-        WHERE id = :id";
+            WHERE id = :id
+            AND deleted_at IS NULL
+";
 
         $statement = $this->prepare($sql);
 
@@ -80,13 +81,13 @@ final class ProductRepository extends Repository
             'id' => $productId
         ]);
 
-        return $statement->rowCount() > 0;
+        return $statement->rowCount() === 1;
 
     }
 
     public function findById(int $productId): ?array
     {
-        $sql = "SELECT * from products WHERE id = :id AND deleted_at IS NULL";
+        $sql = "SELECT * from products WHERE id = :id AND deleted_at IS NULL Limit 1";
 
         $statement = $this->prepare($sql);
 
@@ -116,38 +117,131 @@ final class ProductRepository extends Repository
 
     }
 
-    public function findAll(): array
-    {
-        $sql = "SELECT * from products WHERE deleted_at IS NULL ORDER BY created_at DESC";
+    
+    public function findVendorProducts(
+        int $vendorId,
+        int $limit,
+        int $offset,
+        ?string $search = null,
+        ?int $categoryId = null,
+        ?string $status = null,
+        string $sortBy = 'created_at',
+        string $sortDirection = 'DESC'
+    ): array {
+
+
+
+        $sortDirection = strtoupper($sortDirection);
+
+        if (!in_array($sortDirection, ['ASC', 'DESC'], true)) {
+            $sortDirection = 'DESC';
+        }
+
+        $sql = "
+        SELECT
+            p.id,
+            p.product_name,
+            p.slug,
+            p.brand,
+            p.selling_price,
+            p.discount_type,
+            p.discount_value,
+            p.stock_quantity,
+            p.status,
+            p.created_at,
+            c.category_name,
+            (
+                SELECT image_path
+                FROM product_images
+                WHERE product_id = p.id
+                ORDER BY sort_order ASC
+                LIMIT 1
+            ) AS image_path
+        FROM products p
+        INNER JOIN categories c
+            ON c.id = p.category_id
+        WHERE
+            p.vendor_id = :vendor_id
+            AND p.deleted_at IS NULL
+    ";
+
+        $parameters = [
+            'vendor_id' => $vendorId,
+        ];
+
+        $this->buildVendorProductFilters($sql, $parameters,$search,$categoryId,$status);
+        $sql .= "
+        ORDER BY p.{$sortBy} {$sortDirection}
+        LIMIT :limit
+        OFFSET :offset
+    ";
 
         $statement = $this->prepare($sql);
 
+        foreach ($parameters as $key => $value) {
+            $statement->bindValue(":{$key}", $value);
+        }
+
+        $statement->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $statement->bindValue(':offset', $offset, PDO::PARAM_INT);
+
         $statement->execute();
 
-        $products = $statement->fetchAll();
-
-        return $products;
-
-
+        return $statement->fetchAll();
     }
+    public function countVendorProducts(
+        int $vendorId,
+        ?string $search = null,
+        ?int $categoryId = null,
+        ?string $status = null
+    ): int {
 
-    public function findByVendor(int $vendorId): array
-    {
-        $sql = "SELECT *
+        $sql = "
+        SELECT COUNT(*)
         FROM products
         WHERE vendor_id = :vendor_id
         AND deleted_at IS NULL
-        ORDER BY created_at DESC";
+    ";
+
+        $parameters = [
+            'vendor_id' => $vendorId,
+        ];
+
+        $this->buildVendorProductFilters($sql, $parameters,$search,$categoryId,$status);
+        $statement = $this->prepare($sql);
+        $statement->execute($parameters);
+
+        return (int) $statement->fetchColumn();
+    }
+    public function findVendorProductById(
+        int $vendorId,
+        int $productId
+    ): ?array {
+
+        $sql = "
+        SELECT
+            p.*,
+            c.category_name
+        FROM products p
+        INNER JOIN categories c
+            ON c.id = p.category_id
+        WHERE
+            p.id = :product_id
+            AND p.vendor_id = :vendor_id
+            AND p.deleted_at IS NULL
+        LIMIT 1
+    ";
 
         $statement = $this->prepare($sql);
 
         $statement->execute([
-            'vendor_id' => $vendorId
+            'product_id' => $productId,
+            'vendor_id' => $vendorId,
         ]);
 
-        $products = $statement->fetchAll();
+        $product = $statement->fetch();
 
-        return $products;
+        return $product ?: null;
     }
     public function slugExists(int $vendorId, string $slug): bool
     {
@@ -165,5 +259,53 @@ final class ProductRepository extends Repository
         ]);
 
         return (bool) $statement->fetchColumn();
+    }
+    public function slugExistsExcept(
+        int $vendorId,
+        string $slug,
+        int $productId
+    ): bool {
+        $sql = "
+        SELECT 1
+        FROM products
+        WHERE vendor_id = :vendor_id
+          AND slug = :slug
+          AND id <> :product_id
+          AND deleted_at IS NULL
+        LIMIT 1
+    ";
+
+        $statement = $this->prepare($sql);
+
+        $statement->execute([
+            'vendor_id' => $vendorId,
+            'slug' => $slug,
+            'product_id' => $productId
+        ]);
+
+        return (bool) $statement->fetchColumn();
+    }
+    private function buildVendorProductFilters(
+        string &$sql,
+        array &$parameters,
+        ?string $search,
+        ?int $categoryId,
+        ?string $status
+    ): void {
+        if ($search !== null && $search !== '') {
+            $sql .= " AND product_name LIKE :search";
+            $parameters['search'] = '%' . $search . '%';
+        }
+
+        if ($categoryId !== null) {
+            $sql .= " AND category_id = :category_id";
+            $parameters['category_id'] = $categoryId;
+        }
+
+        if ($status !== null) {
+            $sql .= " AND status = :status";
+            $parameters['status'] = $status;
+        }
+
     }
 }

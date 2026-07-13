@@ -13,7 +13,6 @@ class Session
             $lifetime = 30 * 24 * 60 * 60;
 
             session_set_cookie_params([
-                'lifetime' => $lifetime,
                 'path' => '/',
                 'domain' => '', // Contextually defaults to current host domain
                 'secure' => isset($_SERVER['HTTPS']), // Enforces HTTPS if active

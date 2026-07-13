@@ -85,7 +85,12 @@ class Validator
     {
         return $this->data;
     }
+    public function setValidated(array $data): self
+    {
+        $this->data = $data;
 
+        return $this;
+    }
     /**
      * -----------------------------
      * Validation Rules

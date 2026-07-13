@@ -30,13 +30,9 @@ class ProductService
 
             $productData['discount_value'] ??= null;
             $productId = $this->productRepository->create($productData);
-            if (
-                isset($files['name']) &&
-                !empty($files['name'])
-            ) {
+            if ($this->imageService->hasUploads($files)) {
                 $this->imageService->uploadProductImages($productId, $files);
             }
-            echo 5;
 
             $this->pdo->commit();
 
@@ -44,12 +40,50 @@ class ProductService
         } catch (Throwable $e) {
             $this->pdo->rollBack();
 
-            die("Unable to add product. " . $e);
+            throw $e;
+
         }
+    }
+    public function getVendorProducts(
+        int $vendorId,
+        array $filters
+    ): array {
+
+        $totalProducts = $this->productRepository->countVendorProducts(
+            $vendorId,
+            $filters['search'],
+            $filters['category_id'],
+            $filters['status']
+        );
+
+        $pagination = $this->calculatePagination(
+            $filters['page'],
+            $filters['per_page'],
+            $totalProducts
+        );
+
+        $products = $this->productRepository->findVendorProducts(
+            $vendorId,
+            $pagination['per_page'],
+            $pagination['offset'],
+            $filters['search'],
+            $filters['category_id'],
+            $filters['status'],
+            $filters['sort_by'],
+            $filters['sort_direction']
+        );
+
+        return [
+            'products' => $products,
+            'pagination' => $pagination,
+            'filters' => $filters,
+        ];
     }
     private function generateUniqueSlug(
         int $vendorId,
-        string $productName
+        string $productName,
+        ?int $ignoreProductId = null
+
     ): string {
 
         $baseSlug = Html::slug($productName);
@@ -59,15 +93,53 @@ class ProductService
         $counter = 1;
 
         while (
-            $this->productRepository->slugExists(
+
+            $ignoreProductId === null
+
+            ? $this->productRepository->slugExists(
                 $vendorId,
                 $slug
             )
+
+            : $this->productRepository->slugExistsExcept(
+                $vendorId,
+                $slug,
+                $ignoreProductId
+            )
+
         ) {
             $slug = $baseSlug . '-' . $counter;
             $counter++;
         }
 
         return $slug;
+    }
+    private function calculatePagination(
+        int $page,
+        int $perPage,
+        int $totalProducts
+    ): array {
+
+        $totalPages = max(
+            1,
+            (int) ceil($totalProducts / $perPage)
+        );
+
+        $page = min(
+            $page,
+            $totalPages
+        );
+
+        $offset = ($page - 1) * $perPage;
+
+        return [
+            'current_page' => $page,
+            'per_page' => $perPage,
+            'offset' => $offset,
+            'total_products' => $totalProducts,
+            'total_pages' => $totalPages,
+            'has_previous' => $page > 1,
+            'has_next' => $page < $totalPages,
+        ];
     }
 }
