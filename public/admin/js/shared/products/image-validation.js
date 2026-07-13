@@ -1,7 +1,7 @@
 const MAX_PRODUCT_IMAGES = 5;
 
-function initializeImageValidation(fileInput) {
-
+function initializeImageValidation(app) {
+    let fileInput = app.imageGallery;
     if (!fileInput) {
         return;
     }

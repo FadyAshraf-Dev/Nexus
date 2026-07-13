@@ -64,6 +64,7 @@ function validateContainer(container) {
 ===================================================== */
 
 function initializeFormValidation(app) {
+  markRequiredFields();
   const { dom, state } = app;
     validationState = app.state;
 
@@ -123,5 +124,15 @@ function validateFileCount(field) {
   clearFeedback(field);
 
   return true;
+}
+function markRequiredFields(){
+    document.querySelectorAll("[required]").forEach(function (field) {
+    const label = document.querySelector(`label[for="${field.id}"]`);
+
+    if (label) {
+      label.classList.add("required");
+    }
+  });
+
 }
 

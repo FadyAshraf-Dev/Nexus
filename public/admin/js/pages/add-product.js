@@ -35,12 +35,9 @@ function initializePage() {
   initializeDynamicConstraints(app);
 
   initializeWizardValidation(app);
-  initializeImageGallery(app);
-  document.querySelectorAll("[required]").forEach(function (field) {
-    const label = document.querySelector(`label[for="${field.id}"]`);
 
-    if (label) {
-      label.classList.add("required");
-    }
-  });
+  initializeImageGallery(app);
+
+  initializeImageValidation(app);
+
 }
