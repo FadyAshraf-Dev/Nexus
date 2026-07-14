@@ -1,4 +1,4 @@
-class Renderer {
+export default class Renderer {
 
     static replace(element, html) {
         this.ensureElement(element);

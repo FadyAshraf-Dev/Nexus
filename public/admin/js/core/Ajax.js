@@ -1,4 +1,4 @@
-class Ajax {
+export default class Ajax {
   static timeout = 15000;
 
   static csrfToken;

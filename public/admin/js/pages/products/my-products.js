@@ -1,120 +1,162 @@
+import Ajax from "../../core/Ajax.js";
+import Renderer from "../../core/Renderer.js";
+import ProductTemplate from "../../templates/ProductTemplate.js";
+
 class MyProducts {
 
-    static #tableBody = document.getElementById("productsTableBody");
+    constructor() {
 
-    static async init() {
+        this.template = new ProductTemplate();
+
+        this.tbody = document.querySelector(
+            "#productsTable tbody"
+        );
+
+        this.filters = {
+            page: 1,
+            per_page: 10,
+            search: "",
+            sort_by: "created_at",
+            sort_direction: "DESC",
+            status: "",
+            category_id: ""
+        };
+    }
+
+    async init() {
+
+        await this.loadProducts();
+
+        this.bindEvents();
+    }
+
+    async loadProducts() {
 
         try {
 
-            Renderer.showLoading(this.#tableBody);
+            Renderer.showLoading(this.tbody);
 
-            const response = await Ajax.get("api/vendor");
+            const params =
+                new URLSearchParams(this.filters);
 
-            console.log(response);
-
-            if (!response.success) {
-                Renderer.showError(
-                    this.#tableBody,
-                    response.message ?? "Unable to load products."
+            const response =
+                await Ajax.get(
+                    "/admin/api/vendor/?" +
+                    params.toString()
                 );
-
-                return;
-            }
-
-            const products = response.data.products ?? [];
-            
-            
-
-            if (products.length === 0) {
-                Renderer.showEmpty(
-                    this.#tableBody,
-                    "No products found."
-                );
-
-                return;
-            }
-
-            let html = "";
-            console.log(products);
-            for (const product of products) {
-
-                html += `
-                    <tr>
-
-                        <td>
-                            <img
-                                src="${product.image_path}"
-                                class="rounded"
-                                width="60"
-                                height="60"
-                                alt="${product.product_name}">
-                        </td>
-
-                        <td>${product.product_name}</td>
-
-                        <td>${product.category_name}</td>
-
-                        <td>${product.selling_price}</td>
-
-                        <td>${product.stock_quantity}</td>
-
-                        <td>
-                            <span class="badge bg-success">
-                                ${product.status}
-                            </span>
-                        </td>
-
-                        <td>${product.discount ?? "-"}</td>
-
-                        <td class="text-end">
-
-                            <button
-                                class="btn btn-datatable btn-icon btn-transparent-dark me-2"
-                                title="Edit">
-
-                                <i data-feather="edit"></i>
-
-                            </button>
-
-                            <button
-                                class="btn btn-datatable btn-icon btn-transparent-dark"
-                                title="Delete">
-
-                                <i data-feather="trash-2"></i>
-
-                            </button>
-
-                        </td>
-
-                    </tr>
-                `;
-
-            }
 
             Renderer.replace(
-                this.#tableBody,
-                html
+                this.tbody,
+                this.template.table(
+                    response.data.products
+                )
             );
 
             feather.replace();
 
-        }
-        catch (error) {
-
-            console.error(error);
+        } catch (error) {
 
             Renderer.showError(
-                this.#tableBody,
-                "An unexpected error occurred."
+                this.tbody,
+                error.message
             );
 
+            console.error(error);
+        }
+    }
+
+    bindEvents() {
+
+        this.bindSearch();
+
+        this.bindPagination();
+
+        this.bindActions();
+    }
+
+    bindSearch() {
+
+        const search =
+            document.querySelector("#search");
+
+        if (!search) {
+            return;
         }
 
+        search.addEventListener(
+            "input",
+            async e => {
+
+                this.filters.search =
+                    e.target.value;
+
+                this.filters.page = 1;
+
+                await this.loadProducts();
+
+            }
+        );
+    }
+
+    bindPagination() {
+
+        document.addEventListener(
+            "click",
+            async e => {
+
+                const button =
+                    e.target.closest("[data-page]");
+
+                if (!button) {
+                    return;
+                }
+
+                this.filters.page =
+                    Number(button.dataset.page);
+
+                await this.loadProducts();
+
+            }
+        );
+    }
+
+    bindActions() {
+
+        document.addEventListener(
+            "click",
+            e => {
+
+                const button =
+                    e.target.closest("[data-action]");
+
+                if (!button) {
+                    return;
+                }
+
+                const id =
+                    Number(button.dataset.id);
+
+                switch (button.dataset.action) {
+
+                    case "edit":
+
+                        location.href =
+                            `/admin/products/edit-product.php?id=${id}`;
+
+                        break;
+
+                    case "delete":
+
+                        console.log(id);
+
+                        break;
+
+                }
+
+            }
+        );
     }
 
 }
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => MyProducts.init()
-);
+new MyProducts().init();

@@ -100,9 +100,7 @@ $userRole = Session::roleId();
 		</div>
 	</div>
 	<?php require 'includes/scripts.php'; ?>
-	<script src="<?= Asset::admin('js/core/Ajax.js') ?>"></script>
-	<script src="<?= Asset::admin('js/core/Renderer.js') ?>"></script>
-	<script src="<?= Asset::admin('js/pages/products/my-products.js') ?>"></script>
+	<script type="module" src="<?= Asset::admin('js/pages/products/my-products.js') ?>"></script>
 </body>
 
 </html>
