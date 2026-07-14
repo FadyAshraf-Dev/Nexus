@@ -1,4 +1,4 @@
-import Template from "./Template.js";
+import Template from "../core/Template.js";
 
 export default class ProductTemplate extends Template {
   table(products) {
@@ -9,48 +9,6 @@ export default class ProductTemplate extends Template {
     return products.map((product) => this.row(product)).join("");
   }
 
-  // row(product) {
-
-  //     return `
-  //         <tr>
-
-  //             <td>
-  //                 ${this.image(
-  //                     product.image_path,
-  //                     product.product_name
-  //                 )}
-  //             </td>
-
-  //             <td>
-  //                 ${this.escape(product.product_name)}
-  //             </td>
-
-  //             <td>
-  //                 ${this.badge(
-  //                     product.category_name,
-  //                     "bg-light text-dark"
-  //                 )}
-  //             </td>
-
-  //             <td>
-  //                 ${this.price(product)}
-  //             </td>
-
-  //             <td>
-  //                 ${product.stock_quantity}
-  //             </td>
-
-  //             <td>
-  //                 ${this.status(product.status)}
-  //             </td>
-
-  //             <td>
-  //                 ${this.actions(product)}
-  //             </td>
-
-  //         </tr>
-  //     `;
-  // }
   row(product) {
     return `
         <tr>

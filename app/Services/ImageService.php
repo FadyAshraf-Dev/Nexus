@@ -68,27 +68,18 @@ final class ImageService
 
         $image = $this->repository->findById($imageId);
         if ($image === null) {
-            // throw new RuntimeException('Image not found.');
-            die('Image not found.');
-
+            throw new RuntimeException('Image not found.');
         }
         $directory = $this->getUploadDirectory();
         $fullPath = $directory . DIRECTORY_SEPARATOR . basename($image["image_path"]);
         if (!is_file($fullPath)) {
-            // throw new RuntimeException(
-            //     'Image file is missing from storage.'
-            // );
-            die('Image file is missing from storage.'
-            );
-
+            throw new RuntimeException('Image file is missing from storage.');
         }
         if (!unlink($fullPath)) {
-            // throw new RuntimeException('Unable to delete image file.');
-            die('Unable to delete image file.');
+            throw new RuntimeException('Unable to delete image file.');
         }
         if (!$this->repository->delete($imageId)) {
-            // throw new RuntimeException('Unable to delete image record.');
-            die('Unable to delete image record.');
+            throw new RuntimeException('Unable to delete image record.');
         }
 
         return true;
@@ -106,59 +97,63 @@ final class ImageService
             $fullPath = $directory . DIRECTORY_SEPARATOR . basename($image["image_path"]);
 
             if (!is_file($fullPath)) {
-                // throw new RuntimeException(
-                //     'Image file is missing from storage.'
-                // );
-                die('Image file is missing from storage.');
+                throw new RuntimeException(
+                    'Image file is missing from storage.'
+                );
             }
             if (!unlink($fullPath)) {
-                // throw new RuntimeException('Unable to delete image file.');
-                die('Unable to delete image file.');
+                throw new RuntimeException('Unable to delete image file.');
 
             }
         }
 
         if (!$this->repository->deleteByProduct($productId)) {
-            // throw new RuntimeException('Unable to delete product image records.');
-            die('Unable to delete product image records.');
+            throw new RuntimeException('Unable to delete product image records.');
 
         }
 
         return true;
     }
+    public function replaceProductImages(
+        int $productId,
+        array $files
+    ): void {
+
+        $this->deleteProductImages($productId);
+
+        $this->uploadProductImages(
+            $productId,
+            $files
+        );
+
+    }
     private function validateFile(array $file): void
     {
         if ($file['error'] !== UPLOAD_ERR_OK) {
-            die('Image upload failed.');
+            throw new RuntimeException('Image upload failed.');
         }
-
         if (!is_uploaded_file($file['tmp_name'])) {
-            die('Invalid uploaded file.');
+            throw new RuntimeException('Invalid uploaded file.');
         }
-
         $maxSize = Config::app("max_image_size");
 
         if ($file['size'] > $maxSize) {
-            die('Image exceeds maximum size.');
+            throw new RuntimeException('Image exceeds maximum size.');
         }
-
         $finfo = new finfo(FILEINFO_MIME_TYPE);
 
         $mime = $finfo->file($file['tmp_name']);
         if ($mime === false) {
-            die('Unable to determine image type.');
+            throw new RuntimeException('Unable to determine image type.');
         }
-
         $allowedTypes = Config::app("allowed_image_types");
 
         if (!in_array($mime, $allowedTypes, true)) {
-            die('Unsupported image type.');
+            throw new RuntimeException('Unsupported image type.');
         }
-
         if (getimagesize($file['tmp_name']) === false) {
-            die('File is not a valid image.');
+            throw new RuntimeException('File is not a valid image.');
         }
-
 
     }
 
@@ -192,9 +187,9 @@ final class ImageService
                 $destination
             )
         ) {
-            die('Unable to save uploaded image.');
+            throw new RuntimeException('Unable to save uploaded image.');
         }
-        $relativePath = 'uploads/products/' . $filename;
+        $relativePath = Config::app("urls.product_uploads") . $filename;
 
         return $relativePath;
     }
@@ -203,10 +198,9 @@ final class ImageService
     {
         $directory = Config::app("paths.product_uploads");
 
-        echo (string) Config::app('paths.product_uploads');
         if (!is_dir($directory)) {
             if (!mkdir($directory, 0755, true)) {
-                die('Unable to create upload directory.');
+                throw new RuntimeException('Unable to create upload directory.');
             }
         }
 
@@ -243,5 +237,10 @@ final class ImageService
 
 
         return $normalized;
+    }
+
+    public function hasUploads(array $files): bool
+    {
+        return isset($files['name']) && !empty($files['name'][0]);
     }
 }

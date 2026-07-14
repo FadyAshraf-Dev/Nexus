@@ -1,162 +1,89 @@
-import Ajax from "../../core/Ajax.js";
-import Renderer from "../../core/Renderer.js";
-import ProductTemplate from "../../templates/ProductTemplate.js";
+import Dom from "../../core/Dom.js";
 
-class MyProducts {
+import FormValidation from "../../forms/FormValidation.js";
+import Wizard from "../../forms/Wizard.js";
+import WizardValidation from "../../forms/WizardValidation.js";
+
+import ProductImageGallery from "../../products/ProductImageGallery.js";
+import DiscountController from "../../products/DiscountController.js";
+import DynamicConstraints from "../../products/DynamicConstraints.js";
+
+const ELEMENTS = {
+
+    form: "addProductForm",
+
+    costPrice: "inputCostPrice",
+    sellingPrice: "inputSellingPrice",
+
+    stockQuantity: "inputStockQuantity",
+    lowStock: "inputLowStockThreshold",
+
+    discountType: "selectDiscountType",
+    discountValue: "inputDiscountValue",
+
+    imageGallery: "inputImageGallery",
+    imagePreviewContainer: "imagePreviewContainer"
+
+};
+
+class AddProductPage {
 
     constructor() {
 
-        this.template = new ProductTemplate();
+        this.dom = new Dom(ELEMENTS);
 
-        this.tbody = document.querySelector(
-            "#productsTable tbody"
-        );
+        this.validation =
+            new FormValidation(this.dom);
 
-        this.filters = {
-            page: 1,
-            per_page: 10,
-            search: "",
-            sort_by: "created_at",
-            sort_direction: "DESC",
-            status: "",
-            category_id: ""
-        };
-    }
+        this.wizard =
+            new Wizard(this.dom);
 
-    async init() {
+        this.constraints =
+            new DynamicConstraints(this.dom);
 
-        await this.loadProducts();
+        this.discount =
+            new DiscountController(this.dom);
 
-        this.bindEvents();
-    }
+        this.imageGallery =
+            new ProductImageGallery(this.dom);
 
-    async loadProducts() {
-
-        try {
-
-            Renderer.showLoading(this.tbody);
-
-            const params =
-                new URLSearchParams(this.filters);
-
-            const response =
-                await Ajax.get(
-                    "/admin/api/vendor/?" +
-                    params.toString()
-                );
-
-            Renderer.replace(
-                this.tbody,
-                this.template.table(
-                    response.data.products
-                )
+        this.wizardValidation =
+            new WizardValidation(
+                this.dom,
+                this.wizard,
+                this.validation
             );
 
-            feather.replace();
-
-        } catch (error) {
-
-            Renderer.showError(
-                this.tbody,
-                error.message
-            );
-
-            console.error(error);
-        }
     }
 
-    bindEvents() {
+    initialize() {
 
-        this.bindSearch();
+        this.validation.initialize();
 
-        this.bindPagination();
+        this.wizard.initialize();
 
-        this.bindActions();
-    }
+        this.constraints.initialize();
 
-    bindSearch() {
+        this.discount.initialize();
 
-        const search =
-            document.querySelector("#search");
+        this.imageGallery.initialize();
 
-        if (!search) {
-            return;
-        }
+        this.wizardValidation.initialize();
 
-        search.addEventListener(
-            "input",
-            async e => {
-
-                this.filters.search =
-                    e.target.value;
-
-                this.filters.page = 1;
-
-                await this.loadProducts();
-
-            }
-        );
-    }
-
-    bindPagination() {
-
-        document.addEventListener(
-            "click",
-            async e => {
-
-                const button =
-                    e.target.closest("[data-page]");
-
-                if (!button) {
-                    return;
-                }
-
-                this.filters.page =
-                    Number(button.dataset.page);
-
-                await this.loadProducts();
-
-            }
-        );
-    }
-
-    bindActions() {
-
-        document.addEventListener(
-            "click",
-            e => {
-
-                const button =
-                    e.target.closest("[data-action]");
-
-                if (!button) {
-                    return;
-                }
-
-                const id =
-                    Number(button.dataset.id);
-
-                switch (button.dataset.action) {
-
-                    case "edit":
-
-                        location.href =
-                            `/admin/products/edit-product.php?id=${id}`;
-
-                        break;
-
-                    case "delete":
-
-                        console.log(id);
-
-                        break;
-
-                }
-
-            }
-        );
     }
 
 }
 
-new MyProducts().init();
+document.addEventListener(
+
+    "DOMContentLoaded",
+
+    () => {
+
+        const page = new AddProductPage();
+
+        page.initialize();
+
+    }
+
+);
