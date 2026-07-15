@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 final class ProductValidator
 {
-    public const DEFAULT_PER_PAGE = 10;
+    public const DEFAULT_PER_PAGE = 5;
 
     public const ALLOWED_PAGE_SIZES = [
+        5,
         10,
+        15,
+        20,
         25,
-        50,
-        100,
     ];
 
     public const ALLOWED_STATUSES = [

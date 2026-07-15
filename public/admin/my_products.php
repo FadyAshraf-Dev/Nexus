@@ -89,7 +89,11 @@ $userRole = Session::roleId();
 								</table>
 
 							</div>
+							<div id="paginationContainer" class="mt-4">
 
+								<!-- PaginationTemplate -->
+
+							</div>
 						</div>
 
 					</div>
@@ -100,7 +104,7 @@ $userRole = Session::roleId();
 		</div>
 	</div>
 	<?php require 'includes/scripts.php'; ?>
-	<script type="module" src="<?= Asset::admin('js/pages/products/my-products.js') ?>"></script>
+	<script type="module" src="<?= Asset::admin('js/pages/products/MyProducts.js') ?>"></script>
 </body>
 
 </html>

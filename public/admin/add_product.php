@@ -413,7 +413,7 @@ $categories = $categoryRepository->findAll();
    </div>
    <?php require 'includes/scripts.php'; ?>
 
-   <script type="module" src="<?= Asset::admin('js/pages/products/add-product.js') ?>"></script>
+   <script type="module" src="<?= Asset::admin('js/pages/products/AddProduct.js') ?>"></script>
    <script>
 
    </script>

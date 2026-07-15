@@ -26,7 +26,7 @@ const ELEMENTS = {
 
 };
 
-class AddProductPage {
+class AddProduct {
 
     constructor() {
 
@@ -80,7 +80,7 @@ document.addEventListener(
 
     () => {
 
-        const page = new AddProductPage();
+        const page = new AddProduct();
 
         page.initialize();
 
