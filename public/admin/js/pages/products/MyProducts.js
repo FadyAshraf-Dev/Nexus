@@ -29,6 +29,7 @@ class MyProducts {
 
       category_id: "",
     };
+    this.lastQuery = "";
   }
 
   async initialize() {
@@ -77,19 +78,40 @@ class MyProducts {
   bindSearch() {
     const search = document.querySelector("#search");
 
+    const button = document.querySelector("#searchButton");
+
     if (!search) {
       return;
     }
 
-    search.addEventListener("input", async (event) => {
-      this.filters.search = event.target.value;
+    const performSearch = async () => {
+      this.filters.search = search.value.trim();
 
       this.filters.page = 1;
 
       await this.refresh();
-    });
-  }
+    };
 
+    search.addEventListener(
+      "keydown",
+
+      async (event) => {
+        if (event.key !== "Enter") {
+          return;
+        }
+
+        event.preventDefault();
+
+        await performSearch();
+      },
+    );
+
+    button?.addEventListener(
+      "click",
+
+      performSearch,
+    );
+  }
   bindPagination() {
     document.addEventListener("click", async (event) => {
       const button = event.target.closest("[data-page]");

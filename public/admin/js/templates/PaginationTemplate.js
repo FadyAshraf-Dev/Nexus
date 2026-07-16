@@ -21,7 +21,6 @@ export default class PaginationTemplate extends Template {
 
                     <ul class="pagination pagination-sm mb-0">
 
-                        ${this.first(pagination)}
 
                         ${this.previous(pagination)}
 
@@ -29,7 +28,6 @@ export default class PaginationTemplate extends Template {
 
                         ${this.next(pagination)}
 
-                        ${this.last(pagination)}
 
                     </ul>
 

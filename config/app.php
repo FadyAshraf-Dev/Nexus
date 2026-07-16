@@ -28,11 +28,6 @@ return [
 
     'max_image_size' => 2 * 1024 * 1024,
 
-    'pagination' => [
-
-        'per_page' => 15,
-
-    ],
 
     'urls' => [
         'base_url' => '/',
