@@ -29,7 +29,7 @@ class MyProducts {
 
       category_id: "",
     };
-    this.lastQuery = "";
+    this.previousRequest = "";
   }
 
   async initialize() {
@@ -40,13 +40,14 @@ class MyProducts {
 
   async refresh() {
     try {
+      const query = new URLSearchParams(this.filters).toString();
+      if (query === this.previousRequest) {
+        return;
+      }
       Renderer.showLoading(this.tbody);
 
-      const params = new URLSearchParams(this.filters);
-
-      const response = await Ajax.get(
-        "/admin/api/vendor/?" + params.toString(),
-      );
+      this.previousRequest = query;
+      const response = await Ajax.get("/admin/api/vendor/?" + query);
 
       const { products, pagination } = response.data;
 
