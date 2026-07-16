@@ -106,7 +106,17 @@ class MyProducts {
         await performSearch();
       },
     );
+    search.addEventListener("input", async (event) => {
+      if (event.target.value.trim() !== "") {
+        return;
+      }
 
+      this.filters.search = "";
+
+      this.filters.page = 1;
+
+      await this.refresh();
+    });
     button?.addEventListener(
       "click",
 
