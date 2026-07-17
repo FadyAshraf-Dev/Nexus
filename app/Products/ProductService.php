@@ -38,6 +38,96 @@ class ProductService
 
             return $productId;
         } catch (Throwable $e) {
+
+            $this->pdo->rollBack();
+
+            throw new RuntimeException(
+                'Unable to create product.',
+                0,
+                $e
+            );
+
+        }
+    }
+
+    public function updateProduct(
+        int $productId,
+        array $productData,
+        array $files
+    ): void {
+
+        if ($message = ProductValidator::validateImageCount($files)) {
+            throw new InvalidArgumentException($message);
+        }
+
+        try {
+
+            $this->pdo->beginTransaction();
+
+            $existingProduct = $this->productRepository->findById($productId);
+
+            if (!$existingProduct) {
+                throw new RuntimeException("Product not found.");
+            }
+
+            if ($existingProduct['product_name'] !== $productData['product_name']) {
+
+                $productData['slug'] = $this->generateUniqueSlug(
+                    $existingProduct['vendor_id'],
+                    $productData['product_name'],
+                    $productId,
+                );
+            } else {
+
+                $productData['slug'] = $existingProduct['slug'];
+
+            }
+
+            $productData['discount_value'] ??= null;
+
+            $this->productRepository->update(
+                $productId,
+                $productData
+            );
+
+
+            if ($this->imageService->hasUploads($files)) {
+
+                $this->imageService->replaceProductImages($productId, $files);
+
+            }
+            $this->pdo->commit();
+
+        } catch (Throwable $e) {
+
+            $this->pdo->rollBack();
+
+            throw $e;
+
+        }
+    }
+    public function deleteProduct(int $productId): void
+    {
+        try {
+
+            $this->pdo->beginTransaction();
+
+            $product = $this->productRepository->findById($productId);
+
+            if (!$product) {
+                throw new RuntimeException('Product not found.');
+            }
+
+            $this->imageService->deleteProductImages($productId);
+
+            if (!$this->productRepository->delete($productId)) {
+                throw new RuntimeException('Unable to delete product.');
+            }
+
+            $this->pdo->commit();
+
+        } catch (Throwable $e) {
+
             $this->pdo->rollBack();
 
             throw $e;

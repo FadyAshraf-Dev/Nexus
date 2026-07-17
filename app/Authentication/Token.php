@@ -31,7 +31,9 @@ final class Token
         $rememberToken = $this->tokenRepository->findBySelector($selector);
 
         if ($rememberToken === null) {
-            $this->deleteCookie();
+            Cookie::delete(
+                Config::app('cookies.name')
+            );
             return false;
         }
 
@@ -60,8 +62,8 @@ final class Token
         }
 
         $user = $this->userRepository->findById(
-                (int) $rememberToken['user_id']
-            );
+            (int) $rememberToken['user_id']
+        );
 
         if ($user === null) {
             $this->destroy(
@@ -83,7 +85,9 @@ final class Token
     {
         $this->tokenRepository->deleteByUser($userId);
 
-        $this->deleteCookie();
+        Cookie::delete(
+            Config::app('cookies.name')
+        );
     }
     private function generateSelector(): string
     {
@@ -106,30 +110,14 @@ final class Token
         $hashedToken = $this->hashToken($token);
         $expiresAt = new DateTimeImmutable(Config::app('cookies.duration'));
         $this->tokenRepository->create($userId, $selector, $hashedToken, $expiresAt);
-        $this->createCookie($selector, $token, $expiresAt);
-
-    }
-
-    private function createCookie(
-        string $selector,
-        string $token,
-        DateTimeInterface $expiresAt
-    ): void {
-
-        $cookieValue = "$selector:$token";
-
-        setcookie(
+        Cookie::set(
             Config::app('cookies.name'),
-            $cookieValue,
-            [
-                'expires' => $expiresAt->getTimestamp(),
-                'path' => '/',
-                'secure' => isset($_SERVER['HTTPS']),
-                'httponly' => true,
-                'samesite' => 'Lax',
-            ]
+            "$selector:$token",
+            $expiresAt->getTimestamp()
         );
+
     }
+
     private function readCookie(): ?array
     {
         $cookieName = Config::app('cookies.name');
@@ -155,20 +143,6 @@ final class Token
             'token' => $token,
         ];
     }
-    private function deleteCookie(): void
-    {
-        setcookie(
-            Config::app('cookies.name'),
-            '',
-            [
-                'expires' => time() - 3600,
-                'path' => '/',
-                'secure' => isset($_SERVER['HTTPS']),
-                'httponly' => true,
-                'samesite' => 'Lax',
-            ]
-        );
-    }
     private function rotateToken(
         int $tokenId
     ): void {
@@ -189,10 +163,10 @@ final class Token
             $expiresAt
         );
 
-        $this->createCookie(
-            $selector,
-            $token,
-            $expiresAt
+        Cookie::set(
+            Config::app('cookies.name'),
+            "$selector:$token",
+            $expiresAt->getTimestamp()
         );
     }
 }

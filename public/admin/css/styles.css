@@ -21059,3 +21059,105 @@ pre[class*=language-] {
     content: " *";
     color: var(--bs-danger);
 }
+/* .products-toolbar .form-control:focus {
+
+    box-shadow: none;
+
+}
+.products-toolbar .btn:focus {
+
+    box-shadow: none;
+
+}
+.products-toolbar .input-group {
+
+    border-radius: .375rem;
+
+}
+.products-toolbar .input-group:focus-within {
+
+    border-radius: .375rem;
+
+    box-shadow:
+        0 0 0 .25rem rgba(13,110,253,.15);
+
+}
+.products-toolbar .form-control:focus {
+
+    box-shadow: none;
+
+    border-color: #ced4da;
+
+} */
+
+
+
+/* .products-toolbar .input-group:focus-within {
+
+    border-radius: .375rem;
+
+    box-shadow: 0 0 0 .25rem rgba(13,110,253,.15);
+
+}
+.products-toolbar .form-control:focus {
+
+    box-shadow: none;
+
+    border-color: #ced4da;
+
+}
+.products-toolbar .btn:focus {
+
+    box-shadow: none;
+
+}
+
+
+.products-toolbar .input-group:focus-within {
+
+    border-color: #86b7fe;
+
+    box-shadow: 0 0 0 .25rem rgba(13,110,253,.15);
+
+} */
+ /* =====================================================
+   Products Toolbar
+===================================================== */
+
+.products-toolbar {
+
+    margin-bottom: 1.5rem;
+
+}
+
+/* ---------- Search Input ---------- */
+
+.products-toolbar .input-group {
+
+    border-radius: .375rem;
+
+}
+
+.products-toolbar .input-group:focus-within {
+
+    border-radius: .375rem;
+
+    box-shadow: 0 0 0 .25rem rgba(13,110,253,.15);
+
+}
+
+/* ---------- Remove Bootstrap Focus Ring ---------- */
+
+.products-toolbar .form-control:focus {
+
+    box-shadow: none;
+
+    border-color: #ced4da;
+
+}
+
+.products-toolbar .btn:focus {
+
+    box-shadow: none;
+
+}

@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-final class ProductRepository extends Repository 
+final class ProductRepository extends Repository
 {
     public function create(array $data): int
     {
@@ -59,18 +59,41 @@ final class ProductRepository extends Repository
             'stock_quantity' => $data['stock_quantity'],
             'low_stock_threshold' => $data['low_stock_threshold'],
         ]);
-        return (int) $this->pdo->lastInsertId();
+        return $this->lastInsertId();
     }
 
-    public function update(int $productId, array $data): bool
-    {
-    }
+    public function update(
+        int $productId,
+        array $productData
+    ): void {
 
+        $sql = "
+            UPDATE products SET
+            product_name = :product_name,
+            short_description = :short_description,
+            full_description = :full_description,
+            category_id = :category_id,
+            slug = :slug,
+            cost_price = :cost_price,
+            selling_price = :selling_price,
+            stock_quantity = :stock_quantity,
+            low_stock_threshold = :low_stock_threshold,
+            status = :status,
+            discount_type = :discount_type,
+            discount_value = :discount_value
+        WHERE id = :id
+    ";
+
+        $productData['id'] = $productId;
+
+        $statement = $this->pdo->prepare($sql);
+        $statement->execute($productData);
+    }
     public function delete(int $productId): bool
     {
         $sql = "
-        UPDATE products
-        SET deleted_at = NOW()
+            UPDATE products
+            SET deleted_at = NOW()
             WHERE id = :id
             AND deleted_at IS NULL
 ";
@@ -200,7 +223,7 @@ final class ProductRepository extends Repository
         SELECT COUNT(*)
         FROM products
         WHERE vendor_id = :vendor_id
-        AND deleted_at IS NULL
+          AND deleted_at IS NULL
     ";
 
         $parameters = [

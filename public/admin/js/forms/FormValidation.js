@@ -72,7 +72,7 @@ export default class FormValidation {
     return this.validate(this.dom.form);
   }
   handleInput(field) {
-    if (field.type === "file" || !this.state.validationStarted) {
+    if (field.type === "file" || !this.started) {
       return;
     }
 
@@ -105,10 +105,10 @@ export default class FormValidation {
   }
 
   validateFileCount(field) {
-    if (field.files.length > Constraints.MAX_IMAGES) {
+    if (field.files.length > DynamicConstraints.MAX_IMAGES) {
       Feedback.show(
         field,
-        `You may upload a maximum of ${Constraints.MAX_IMAGES} images.`,
+        `You may upload a maximum of ${DynamicConstraints.MAX_IMAGES} images.`,
       );
 
       return false;

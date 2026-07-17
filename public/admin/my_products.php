@@ -50,41 +50,22 @@ $userRole = Session::roleId();
 
 						<div class="card-body">
 							<!-- Products Toolbar -->
-							<div class="products-toolbar mb-4">
+							<div class="products-toolbar d-flex align-items-center mb-4">
 
-								<div class="row g-3 align-items-center">
+								<div class="input-group flex-grow-1 me-2">
 
-									<div class="col-lg-6">
+									<span class="input-group-text">
+										<i data-feather="search"></i>
+									</span>
 
-										<div class="input-group">
-
-											<span class="input-group-text">
-												<i data-feather="search"></i>
-											</span>
-
-											<input type="search" id="search" class="form-control"
-												placeholder="Search products..." autocomplete="off">
-
-											<button id="searchButton" class="btn btn-primary" type="button">
-												Search
-											</button>
-
-										</div>
-
-									</div>
-
-									<!--
-				Future controls go here.
-
-				<div class="col-lg-6">
-					Status
-					Category
-					Sort
-					Show
-				</div>
-			-->
+									<input type="search" id="search" class="form-control"
+										placeholder="Search products..." autocomplete="off">
 
 								</div>
+
+								<button id="searchButton" type="button" class="btn btn-primary px-4">
+									Search
+								</button>
 
 							</div>
 							<div class="table-responsive">

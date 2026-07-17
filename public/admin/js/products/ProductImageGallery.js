@@ -91,14 +91,14 @@ export default class ProductImageGallery {
 
         if (
             this.files.length >
-            ProductConstraints.MAX_IMAGES
+            DynamicConstraints.MAX_IMAGES
         ) {
 
             Feedback.show(
 
-                this.dom.imageInput,
+                this.dom.imageGallery,
 
-                `Maximum ${ProductConstraints.MAX_IMAGES} images allowed.`
+                `Maximum ${DynamicConstraints.MAX_IMAGES} images allowed.`
 
             );
 
@@ -106,7 +106,7 @@ export default class ProductImageGallery {
 
         }
 
-        Feedback.clear(this.dom.imageInput);
+        Feedback.clear(this.dom.imageGallery);
 
         return true;
 
@@ -123,7 +123,7 @@ export default class ProductImageGallery {
 
         });
 
-        this.dom.imageInput.files =
+        this.dom.imageGallery.files =
             transfer.files;
 
     }
