@@ -22,10 +22,18 @@ return [
 
     ],
     'cookies' => [
-        'name' => 'remember_me',
-        'duration' => "+30days",
-    ],
 
+        'remember_me' => [
+            'name' => 'remember_me',
+            'duration' => '+30 days',
+        ],
+
+        'cart' => [
+            'name' => 'shopping_cart',
+            'duration' => '+30 days',
+        ],
+
+    ],
     'max_image_size' => 2 * 1024 * 1024,
 
 

@@ -32,7 +32,7 @@ final class Token
 
         if ($rememberToken === null) {
             Cookie::delete(
-                Config::app('cookies.name')
+                Config::app('cookies.remember_me.name')
             );
             return false;
         }
@@ -86,7 +86,7 @@ final class Token
         $this->tokenRepository->deleteByUser($userId);
 
         Cookie::delete(
-            Config::app('cookies.name')
+            Config::app('cookies.remember_me.name')
         );
     }
     private function generateSelector(): string
@@ -108,10 +108,10 @@ final class Token
         $token = $this->generateToken();
         $selector = $this->generateSelector();
         $hashedToken = $this->hashToken($token);
-        $expiresAt = new DateTimeImmutable(Config::app('cookies.duration'));
+        $expiresAt = new DateTimeImmutable(Config::app('cookies.remember_me.duration'));
         $this->tokenRepository->create($userId, $selector, $hashedToken, $expiresAt);
         Cookie::set(
-            Config::app('cookies.name'),
+            Config::app('cookies.remember_me.name'),
             "$selector:$token",
             $expiresAt->getTimestamp()
         );
@@ -120,7 +120,7 @@ final class Token
 
     private function readCookie(): ?array
     {
-        $cookieName = Config::app('cookies.name');
+        $cookieName = Config::app('cookies.remember_me.name');
 
         if (!isset($_COOKIE[$cookieName])) {
             return null;
@@ -153,7 +153,7 @@ final class Token
         $hashedToken = $this->hashToken($token);
 
         $expiresAt = new DateTimeImmutable(
-            Config::app('cookies.duration')
+            Config::app('cookies.remember_me.duration')
         );
 
         $this->tokenRepository->updateToken(
@@ -164,7 +164,7 @@ final class Token
         );
 
         Cookie::set(
-            Config::app('cookies.name'),
+            Config::app('cookies.remember_me.name'),
             "$selector:$token",
             $expiresAt->getTimestamp()
         );

@@ -134,12 +134,12 @@ class ProductService
 
         }
     }
-    public function getVendorProducts(
-        int $vendorId,
-        array $filters
+    public function getProducts(
+        array $filters,
+        ?int $vendorId = null
     ): array {
 
-        $totalProducts = $this->productRepository->countVendorProducts(
+        $totalProducts = $this->productRepository->countProducts(
             $vendorId,
             $filters['search'],
             $filters['category_id'],
@@ -152,10 +152,10 @@ class ProductService
             $totalProducts
         );
 
-        $products = $this->productRepository->findVendorProducts(
-            $vendorId,
+        $products = $this->productRepository->findProducts(
             $pagination['per_page'],
             $pagination['offset'],
+            $vendorId,
             $filters['search'],
             $filters['category_id'],
             $filters['status'],

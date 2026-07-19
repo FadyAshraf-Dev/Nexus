@@ -140,16 +140,16 @@ final class ProductRepository extends Repository
 
     }
 
-    
-    public function findVendorProducts(
-        int $vendorId,
+
+    public function findProducts(
         int $limit,
         int $offset,
+        ?int $vendorId = null,
         ?string $search = null,
         ?int $categoryId = null,
         ?string $status = null,
         string $sortBy = 'created_at',
-        string $sortDirection = 'DESC'
+        string $sortDirection = 'DESC',
     ): array {
 
 
@@ -161,38 +161,42 @@ final class ProductRepository extends Repository
         }
 
         $sql = "
-        SELECT
-            p.id,
-            p.product_name,
-            p.slug,
-            p.brand,
-            p.selling_price,
-            p.discount_type,
-            p.discount_value,
-            p.stock_quantity,
-            p.status,
-            p.created_at,
-            c.category_name,
-            (
-                SELECT image_path
-                FROM product_images
-                WHERE product_id = p.id
-                ORDER BY sort_order ASC
-                LIMIT 1
-            ) AS image_path
-        FROM products p
-        INNER JOIN categories c
-            ON c.id = p.category_id
-        WHERE
-            p.vendor_id = :vendor_id
-            AND p.deleted_at IS NULL
-    ";
+    SELECT
+        p.id,
+        p.product_name,
+        p.slug,
+        p.brand,
+        p.selling_price,
+        p.discount_type,
+        p.discount_value,
+        p.stock_quantity,
+        p.status,
+        p.created_at,
+        c.category_name,
+        (
+            SELECT image_path
+            FROM product_images
+            WHERE product_id = p.id
+            ORDER BY sort_order ASC
+            LIMIT 1
+        ) AS image_path
+    FROM products p
+    INNER JOIN categories c
+        ON c.id = p.category_id
+    WHERE
+        p.deleted_at IS NULL
+";
 
-        $parameters = [
-            'vendor_id' => $vendorId,
-        ];
+        $parameters = [];
 
-        $this->buildVendorProductFilters($sql, $parameters,$search,$categoryId,$status);
+        $this->buildProductFilters(
+            $sql,
+            $parameters,
+            $search,
+            $categoryId,
+            $status,
+            $vendorId
+        );
         $sql .= "
         ORDER BY p.{$sortBy} {$sortDirection}
         LIMIT :limit
@@ -212,8 +216,8 @@ final class ProductRepository extends Repository
 
         return $statement->fetchAll();
     }
-    public function countVendorProducts(
-        int $vendorId,
+    public function countProducts(
+        ?int $vendorId = null,
         ?string $search = null,
         ?int $categoryId = null,
         ?string $status = null
@@ -222,16 +226,22 @@ final class ProductRepository extends Repository
         $sql = "
         SELECT COUNT(*)
         FROM products
-        WHERE vendor_id = :vendor_id
-          AND deleted_at IS NULL
+        WHERE deleted_at IS NULL
     ";
 
-        $parameters = [
-            'vendor_id' => $vendorId,
-        ];
+        $parameters = [];
 
-        $this->buildVendorProductFilters($sql, $parameters,$search,$categoryId,$status);
+        $this->buildProductFilters(
+            $sql,
+            $parameters,
+            $search,
+            $categoryId,
+            $status,
+            $vendorId
+        );
+
         $statement = $this->prepare($sql);
+
         $statement->execute($parameters);
 
         return (int) $statement->fetchColumn();
@@ -308,13 +318,19 @@ final class ProductRepository extends Repository
 
         return (bool) $statement->fetchColumn();
     }
-    private function buildVendorProductFilters(
+    private function buildProductFilters(
         string &$sql,
         array &$parameters,
         ?string $search,
         ?int $categoryId,
-        ?string $status
+        ?string $status,
+        ?int $vendorId = null
+
     ): void {
+        if ($vendorId !== null) {
+            $sql .= "AND vendor_id = :vendor_id";
+            $parameters['vendor_id'] = $vendorId;
+        }
         if ($search !== null && $search !== '') {
             $sql .= " AND product_name LIKE :search";
             $parameters['search'] = '%' . $search . '%';

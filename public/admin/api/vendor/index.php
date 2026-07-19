@@ -28,9 +28,9 @@ $productService = new ProductService(
     Database::connection()
 );
 
-$result = $productService->getVendorProducts(
-    Session::id(),
-    $validator->validated()
+$result = $productService->getProducts(
+    $validator->validated(),
+    Session::id()
 );
 
 Response::json([
