@@ -33,10 +33,10 @@
 html,
 body {
   height: 100%;
+
   font-family: "Nunito Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
-
 h1,
 h2,
 h3,
@@ -316,9 +316,30 @@ ol {
 -----------------------*/
 
 .header {
-  background: #ffffff;
+  height: 80px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  z-index: 9999;
+
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
+}
+.header--shadow {
+    box-shadow: 0 10px 35px rgba(0,0,0,.08);
 }
 
+.header--hidden {
+    transform: translateY(-100%);
+}
+
+.header .row {
+  height: 80px;
+  align-items: center;
+}
 .header__top {
   background: #111111;
   padding: 10px 0;
@@ -401,14 +422,6 @@ ol {
   color: #111111;
   padding: 2px 15px;
   cursor: pointer;
-}
-
-.header__logo {
-  display: inline-block;
-}
-
-.header__logo a {
-  display: inline-block;
 }
 
 .header__menu {
@@ -1947,10 +1960,32 @@ ol {
   padding-top: 70px;
 }
 
-.footer__about {
-  margin-bottom: 30px;
+.footer__logo {
+  margin-bottom: 24px;
 }
 
+.footer__logo a {
+  display: inline-flex;
+  flex-direction: column;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.footer__logo h2 {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: #ffffff;
+}
+
+.footer__logo span {
+  margin-top: 4px;
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+}
 .footer__about .footer__logo {
   margin-bottom: 30px;
 }
@@ -4012,29 +4047,6 @@ ol {
   position: relative;
   z-index: 2;
 }
-.login__logo {
-  margin-bottom: 35px;
-}
-
-.login__logo a {
-  text-decoration: none;
-}
-
-.login__logo h2 {
-  color: #111111;
-  font-size: 42px;
-  font-weight: 700;
-  letter-spacing: 4px;
-  margin-bottom: 8px;
-}
-
-.login__logo span {
-  color: #888888;
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 3px;
-}
-
 .login__subtitle {
   display: inline-block;
   color: #7d5fff;
@@ -4307,4 +4319,39 @@ ol {
   .login__header h2 {
     font-size: 32px;
   }
+}
+
+/*==================================
+    Header Logo
+==================================*/
+
+.header__logo {
+  height: 80px;
+  display: flex;
+  align-items: center;
+}
+
+.header__logo a {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.header__logo h2 {
+  margin: 0;
+  font-size: 34px;
+  letter-spacing: 4px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.header__logo span {
+  margin-top: 3px;
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #888;
+  line-height: 1;
 }

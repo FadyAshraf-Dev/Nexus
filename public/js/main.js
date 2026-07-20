@@ -214,3 +214,34 @@
     });
 
 })(jQuery);
+const header = document.querySelector(".header");
+
+let lastScroll = 0;
+
+window.addEventListener("scroll", () => {
+
+    const current = window.pageYOffset;
+
+    if (current > 80) {
+
+        header.classList.add("header--shadow");
+
+    } else {
+
+        header.classList.remove("header--shadow");
+
+    }
+
+    if (current > lastScroll && current > 120) {
+
+        header.classList.add("header--hidden");
+
+    } else {
+
+        header.classList.remove("header--hidden");
+
+    }
+
+    lastScroll = current;
+
+});
