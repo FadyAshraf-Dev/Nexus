@@ -95,9 +95,8 @@ require_once dirname(__DIR__, 1) . '/bootstrap/bootstrap.php';
                                 <div class="shop__product__option__right">
                                     <p>Sort by Price:</p>
                                     <select>
-                                        <option value="">Low To High</option>
-                                        <option value="">$0 - $55</option>
-                                        <option value="">$55 - $100</option>
+                                        <option value="ASC">Low To High</option>
+                                        <option value="DESC">High To Low</option>
                                     </select>
                                 </div>
                             </div>
@@ -125,11 +124,7 @@ require_once dirname(__DIR__, 1) . '/bootstrap/bootstrap.php';
 
     <!-- Js Plugins -->
     <?php include 'includes/scripts.php'; ?>
-    <script type="module">
-        import Shop from "/admin/js/pages/shop/Shop.js";
-
-        new Shop().init();
-    </script>
+            <script type="module" src="/admin/js/pages/shop/Shop.js"></script>
 </body>
 
 </html>

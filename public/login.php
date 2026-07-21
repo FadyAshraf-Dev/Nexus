@@ -1,4 +1,10 @@
-<!doctype html>
+<?php
+
+declare(strict_types=1);
+require_once dirname(__DIR__, 1) . '/bootstrap/bootstrap.php';
+
+?>
+<!DOCTYPE html>
 <html lang="zxx">
 <?php include 'includes/head.php'; ?>
 

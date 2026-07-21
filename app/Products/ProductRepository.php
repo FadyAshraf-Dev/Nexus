@@ -122,25 +122,111 @@ final class ProductRepository extends Repository
 
         return $product ?: null;
     }
+    public function findRelatedProducts(
+        int $categoryId,
+        int $excludeProductId,
+        int $limit = 4
+    ): array {
 
-    public function findBySlug(int $vendorId, string $slug): ?array
-    {
-        $sql = "SELECT * from products WHERE vendor_id = :vendor_id AND slug = :slug AND deleted_at IS NULL LIMIT 1";
+        $sql = "
+        SELECT
+            p.id,
+            p.slug,
+            p.product_name,
+            p.selling_price,
+            p.discount_type,
+            p.discount_value,
+            (
+                SELECT image_path
+                FROM product_images
+                WHERE product_id = p.id
+                ORDER BY sort_order
+                LIMIT 1
+            ) AS image_path
+        FROM products p
+        WHERE
+            p.category_id = :category_id
+            AND p.id != :exclude_product_id
+            AND p.status = 'active'
+        ORDER BY RAND()
+        LIMIT :limit
+    ";
+
+        $statement = $this->pdo->prepare($sql);
+
+        $statement->bindValue(
+            ':category_id',
+            $categoryId,
+            PDO::PARAM_INT
+        );
+
+        $statement->bindValue(
+            ':exclude_product_id',
+            $excludeProductId,
+            PDO::PARAM_INT
+        );
+
+        $statement->bindValue(
+            ':limit',
+            $limit,
+            PDO::PARAM_INT
+        );
+
+        $statement->execute();
+
+        return $statement->fetchAll();
+    }
+    public function findBySlug(
+        string $slug,
+        ?int $vendorId = null
+    ): ?array {
+
+        $sql = "
+        SELECT
+            p.id,
+            p.slug,
+            p.product_name,
+            p.short_description,
+            p.full_description,
+            p.selling_price,
+            p.discount_type,
+            p.discount_value,
+            p.stock_quantity,
+            p.brand,
+            p.category_id,
+            c.category_name
+        FROM products p
+        INNER JOIN categories c
+            ON c.id = p.category_id
+        WHERE
+            p.slug = :slug
+            AND p.deleted_at IS NULL
+    ";
+
+        $parameters = [
+            'slug' => $slug,
+        ];
+
+        if ($vendorId !== null) {
+
+            $sql .= " AND p.vendor_id = :vendor_id";
+
+            $parameters['vendor_id'] = $vendorId;
+
+        } else {
+
+            $sql .= " AND p.status = 'active'";
+
+        }
+
+        $sql .= " LIMIT 1";
 
         $statement = $this->prepare($sql);
 
-        $statement->execute([
-            'vendor_id' => $vendorId,
-            'slug' => $slug,
-        ]);
+        $statement->execute($parameters);
 
-        $product = $statement->fetch();
-
-        return $product ?: null;
-
+        return $statement->fetch() ?: null;
     }
-
-
     public function findProducts(
         int $limit,
         int $offset,

@@ -127,6 +127,10 @@ final class ImageService
         );
 
     }
+    public function findByProduct(int $productId): array
+    {
+        return $this->repository->findByProduct($productId);
+    }
     private function validateFile(array $file): void
     {
         if ($file['error'] !== UPLOAD_ERR_OK) {

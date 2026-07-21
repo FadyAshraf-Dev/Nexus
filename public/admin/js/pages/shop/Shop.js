@@ -9,6 +9,8 @@ export default class Shop {
     this.grid = document.getElementById("shop-products");
     this.pagination = document.getElementById("shop-pagination");
     this.summary = document.getElementById("shop-summary");
+    this.searchForm = document.getElementById("header-search-form");
+    this.searchInput = document.getElementById("global-search");
     this.filters = {
       page: 1,
       per_page: 10,
@@ -34,6 +36,8 @@ export default class Shop {
       const response = await Ajax.get(`/api/product/shop.php?${query}`);
 
       const { products, pagination } = response.data;
+
+      this.searchInput.value = this.filters.search;
 
       this.renderProducts(products);
 
@@ -95,6 +99,15 @@ export default class Shop {
         behavior: "smooth",
       });
     });
+    this.searchForm?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      this.filters.search = this.searchInput.value.trim();
+
+      this.filters.page = 1;
+
+      await this.loadProducts();
+    });
   }
 
   showLoading() {
@@ -113,3 +126,6 @@ export default class Shop {
         `;
   }
 }
+const shop = new Shop();
+
+shop.init();

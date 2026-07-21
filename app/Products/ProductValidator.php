@@ -87,66 +87,85 @@ final class ProductValidator
 
         return $validator;
     }
-public static function validateListing(array $input): Validator
-{
-    $validator = (new Validator($input))->validate([
-        'page' => 'nullable|integer|min:1',
+    public static function validateListing(array $input): Validator
+    {
+        $validator = (new Validator($input))->validate([
+            'page' => 'nullable|integer|min:1',
 
-        'per_page' => 'nullable|integer|in:' .
-            implode(',', self::ALLOWED_PAGE_SIZES),
+            'per_page' => 'nullable|integer|in:' .
+                implode(',', self::ALLOWED_PAGE_SIZES),
 
-        'search' => 'nullable|max_len:255',
+            'search' => 'nullable|max_len:255',
 
-        'category_id' => 'nullable|integer|exists:categories,id',
+            'category_id' => 'nullable|integer|exists:categories,id',
 
-        'status' => 'nullable|in:' .
-            implode(',', self::ALLOWED_STATUSES),
+            'status' => 'nullable|in:' .
+                implode(',', self::ALLOWED_STATUSES),
 
-        'sort_by' => 'nullable|in:' .
-            implode(',', self::ALLOWED_SORT_COLUMNS),
+            'sort_by' => 'nullable|in:' .
+                implode(',', self::ALLOWED_SORT_COLUMNS),
 
-        'sort_direction' => 'nullable|in:' .
-            implode(',', self::ALLOWED_SORT_DIRECTIONS),
-    ]);
+            'sort_direction' => 'nullable|in:' .
+                implode(',', self::ALLOWED_SORT_DIRECTIONS),
+        ]);
 
-    if ($validator->fails()) {
+        if ($validator->fails()) {
+            return $validator;
+        }
+
+        $data = $validator->validated();
+
+        $validator->setValidated([
+            'page' => !empty($data['page'])
+                ? (int) $data['page']
+                : 1,
+
+            'per_page' => !empty($data['per_page'])
+                ? (int) $data['per_page']
+                : self::DEFAULT_PER_PAGE,
+
+            'search' => !empty($data['search'])
+                ? $data['search']
+                : null,
+
+            'category_id' => !empty($data['category_id'])
+                ? (int) $data['category_id']
+                : null,
+
+            'status' => !empty($data['status'])
+                ? $data['status']
+                : null,
+
+            'sort_by' => !empty($data['sort_by'])
+                ? $data['sort_by']
+                : self::DEFAULT_SORT_BY,
+
+            'sort_direction' => !empty($data['sort_direction'])
+                ? strtoupper($data['sort_direction'])
+                : self::DEFAULT_SORT_DIRECTION,
+        ]);
+
         return $validator;
     }
+    public static function validateDetails(array $input): Validator
+    {
+        $validator = (new Validator($input))->validate([
+            'slug' => 'required|max_len:200',
+        ]);
 
-    $data = $validator->validated();
+        if ($validator->fails()) {
+            return $validator;
+        }
 
-    $validator->setValidated([
-        'page' => !empty($data['page'])
-            ? (int) $data['page']
-            : 1,
+        $data = $validator->validated();
 
-        'per_page' => !empty($data['per_page'])
-            ? (int) $data['per_page']
-            : self::DEFAULT_PER_PAGE,
+        $validator->setValidated([
+            'slug' => trim($data['slug']),
+        ]);
 
-        'search' => !empty($data['search'])
-            ? $data['search']
-            : null,
-
-        'category_id' => !empty($data['category_id'])
-            ? (int) $data['category_id']
-            : null,
-
-        'status' => !empty($data['status'])
-            ? $data['status']
-            : null,
-
-        'sort_by' => !empty($data['sort_by'])
-            ? $data['sort_by']
-            : self::DEFAULT_SORT_BY,
-
-        'sort_direction' => !empty($data['sort_direction'])
-            ? strtoupper($data['sort_direction'])
-            : self::DEFAULT_SORT_DIRECTION,
-    ]);
-
-    return $validator;
-}    private static function validateDiscount(
+        return $validator;
+    }
+    private static function validateDiscount(
         Validator $validator,
         array $data
     ): void {

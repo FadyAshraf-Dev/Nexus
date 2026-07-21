@@ -169,7 +169,34 @@ class ProductService
             'filters' => $filters,
         ];
     }
-    private function generateUniqueSlug(
+public function getProductDetails(string $slug): array
+{
+    $product = $this->productRepository->findBySlug($slug);
+
+    if (!$product) {
+        throw new RuntimeException('Product not found.');
+    }
+
+    $images = $this->imageService->findByProduct(
+        (int) $product['id']
+    );
+
+    $relatedProducts = $this->productRepository->findRelatedProducts(
+        (int) $product['category_id'],
+        (int) $product['id']
+    );
+
+    return [
+
+        'product' => [
+            ...$product,
+            'images' => $images,
+        ],
+
+        'related_products' => $relatedProducts,
+
+    ];
+}    private function generateUniqueSlug(
         int $vendorId,
         string $productName,
         ?int $ignoreProductId = null

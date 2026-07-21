@@ -9,7 +9,7 @@
         </a>
       </div>
 
-        <form class="header__search">
+        <form class="header__search" id="header-search-form">
 
           <input type="text" id="global-search" placeholder="Search products...">
 
