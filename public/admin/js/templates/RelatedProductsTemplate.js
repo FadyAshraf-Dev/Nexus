@@ -1,64 +1,26 @@
 export default class RelatedProductsTemplate {
-
-    render(products) {
-
-        return products.map(product => `
+  render(products) {
+    return products
+      .map(
+        (product) => `
 
             <div class="col-lg-3 col-md-6 col-sm-6">
 
                 <div class="product__item">
 
-                    <div
-                        class="product__item__pic set-bg"
-                        data-setbg="${product.image_path}">
+<div
+    class="product__item__pic set-bg"
+    data-setbg="${product.image_path}">
 
-                        <ul class="product__hover">
+    <a
+        href="/shop-details.php?slug=${product.slug}"
+        class="product__image-link">
+    </a>
 
-                            <li>
-
-                                <a href="#">
-
-                                    <img src="/img/icon/heart.png" alt="">
-
-                                </a>
-
-                            </li>
-
-                            <li>
-
-                                <a href="#">
-
-                                    <img src="/img/icon/compare.png" alt="">
-
-                                    <span>Compare</span>
-
-                                </a>
-
-                            </li>
-
-                            <li>
-
-                                <a href="/shop-details.php?slug=${product.slug}">
-
-                                    <img src="/img/icon/search.png" alt="">
-
-                                </a>
-
-                            </li>
-
-                        </ul>
-
-                    </div>
-
+</div>
                     <div class="product__item__text">
 
                         <h6>${product.product_name}</h6>
-
-                        <a href="#" class="add-cart">
-
-                            + Add To Cart
-
-                        </a>
 
                         <h5>
 
@@ -73,14 +35,14 @@ export default class RelatedProductsTemplate {
 
                         </h5>
 
-                    </div>
+                        </div>
 
                 </div>
 
             </div>
 
-        `).join("");
-
-    }
-
+        `,
+      )
+      .join("");
+  }
 }

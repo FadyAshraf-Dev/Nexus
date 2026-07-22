@@ -58,12 +58,11 @@ try {
 
                 'display_price' => round($displayPrice, 2),
 
-                // 'old_price' =>
-                //     $product['discount_type'] !== null
-                //         ? round($sellingPrice, 2)
-                //         : null,
+                'old_price' =>
+                    $product['discount_type'] !== ""
+                        ? round($sellingPrice, 2)
+                        : null,
 
-                'discount_type'=>$product['discount_type'],
                 'is_on_sale' =>
                     $product['discount_type'] !== "",
             ];

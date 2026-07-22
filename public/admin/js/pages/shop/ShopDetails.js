@@ -73,12 +73,10 @@ export default class ShopDetails {
   }
 
   renderRelatedProducts(products) {
-    Renderer.replace(
-      this.relatedProducts,
-      this.relatedTemplate.render(products),
-    );
-  }
+    console.log(products);
 
+    this.relatedProducts.innerHTML = this.relatedTemplate.render(products);
+  }
   renderProduct(product) {
     document.title = product.product_name;
 

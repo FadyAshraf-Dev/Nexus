@@ -9,40 +9,22 @@ export default class ShopTemplate extends Template {
 
                 <div class="product__item ${product.is_on_sale ? "sale" : ""}">
 
-                    <div
+<div
                         class="product__item__pic set-bg"
-                        style="background-image:url('${this.escape(product.image_path)}')"
-                    >
+                        data-setbg="${this.escape(product.image_path)}">
 
-                        ${product.is_on_sale
-                            ? `<span class="label">Sale</span>`
-                            : ""}
+                        <a
+                            href="shop-details.php?slug=${encodeURIComponent(product.slug)}"
+                            class="product__image-link">
+                        </a>
 
-                        <ul class="product__hover">
-
-                            <li>
-                                <a href="#">
-                                    <img src="img/icon/heart.png" alt="">
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="#">
-                                    <img src="img/icon/compare.png" alt="">
-                                    <span>Compare</span>
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="shop-details.php?slug=${encodeURIComponent(product.slug)}">
-                                    <img src="img/icon/search.png" alt="">
-                                </a>
-                            </li>
-
-                        </ul>
+                        ${
+                            product.old_price !== null
+                                ? `<span class="label">Sale</span>`
+                                : ""
+                        }
 
                     </div>
-
                     <div class="product__item__text">
 
                         <h6>${this.escape(product.product_name)}</h6>
@@ -57,6 +39,12 @@ export default class ShopTemplate extends Template {
 
                         <h5>
                             $${this.currency(product.display_price)}
+                            ${product.old_price !== null
+                                ? `<span style="text-decoration:line-through;color:#999;font-size:14px;margin-left:8px;">
+                                    $${product.old_price}
+                                   </span>`
+                                : ""
+                            }
                         </h5>
 
                     </div>

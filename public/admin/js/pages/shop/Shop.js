@@ -41,6 +41,11 @@ export default class Shop {
 
       this.renderProducts(products);
 
+      $(".set-bg").each(function () {
+        const bg = $(this).data("setbg");
+        $(this).css("background-image", `url(${bg})`);
+      });
+
       this.renderPagination(pagination);
 
       this.renderSummary(pagination);
