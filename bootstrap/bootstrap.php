@@ -10,6 +10,20 @@ ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 Config::load();
 Session::start();
+$contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+
+if (str_contains($contentType, 'application/json')) {
+
+    $json = json_decode(
+        file_get_contents('php://input'),
+        true
+    );
+
+    if (is_array($json)) {
+        $_POST = $json;
+    }
+
+}
 if (Session::guest()) {
 
     try {
