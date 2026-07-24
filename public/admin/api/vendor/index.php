@@ -9,31 +9,46 @@ Gatekeeper::authorize([
 ]);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+
     Response::json([
         'success' => false,
         'message' => 'Method Not Allowed.',
     ], 405);
+
 }
 
-$validator = ProductValidator::validateListing($_GET);
+try {
 
-if ($validator->fails()) {
+    $validator = ProductValidator::validateListing($_GET);
+
+    if ($validator->fails()) {
+
+        Response::json([
+            'success' => false,
+            'errors' => $validator->errors(),
+        ], 422);
+
+    }
+
+    $productService = new ProductService(
+        Database::connection()
+    );
+
+    $result = $productService->getProducts(
+        $validator->validated(),
+        Session::id()
+    );
+
+    Response::json([
+        'success' => true,
+        'data' => $result,
+    ]);
+
+} catch (Throwable $e) {
+
     Response::json([
         'success' => false,
-        'errors' => $validator->errors(),
-    ], 422);
+        'message' => $e->getMessage(),
+    ], 500);
+
 }
-
-$productService = new ProductService(
-    Database::connection()
-);
-
-$result = $productService->getProducts(
-    $validator->validated(),
-    Session::id()
-);
-
-Response::json([
-    'success' => true,
-    'data' => $result,
-]);
