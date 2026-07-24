@@ -1,13 +1,23 @@
 import Ajax from "../../core/Ajax.js";
 import Renderer from "../../core/Renderer.js";
-
+import Cart from "../../cart/Cart.js";
 import ShopDetailsGalleryTemplate from "../../templates/ShopDetailsGalleryTemplate.js";
 
 import RelatedProductsTemplate from "../../templates/RelatedProductsTemplate.js";
 
 export default class ShopDetails {
   constructor() {
+    this.cart = new Cart();
+    this.quantityInput = document.getElementById("quantity");
+    console.log(this.quantityInput);
+
+    this.addToCartButton = document.getElementById("add-to-cart");
+    console.log(this.addToCartButton);
+
+    this.cartCount = document.getElementById("cart-count");
+    console.log(this.cartCount);
     this.galleryTemplate = new ShopDetailsGalleryTemplate();
+
     this.relatedTemplate = new RelatedProductsTemplate();
 
     this.slug = new URLSearchParams(window.location.search).get("slug");
@@ -22,8 +32,11 @@ export default class ShopDetails {
     this.shortDescription = document.getElementById(
       "product-short-description",
     );
+
     this.fullDescription = document.getElementById("product-full-description");
+
     this.priceContainer = document.getElementById("product-price-container");
+
     this.categoryRow = document.getElementById("product-category-row");
 
     this.brandRow = document.getElementById("product-brand-row");
@@ -35,7 +48,9 @@ export default class ShopDetails {
 
       return;
     }
+    const response = await this.cart.count();
 
+    this.updateCartBadge(response.data.cart_count);
     await this.loadProduct();
   }
 
@@ -47,6 +62,7 @@ export default class ShopDetails {
 
       const product = response.data;
 
+      this.product = product;
       this.renderGallery(product.images);
 
       this.renderProduct(product);
@@ -56,15 +72,34 @@ export default class ShopDetails {
       $(".set-bg").each(function () {
         $(this).css("background-image", `url(${$(this).data("setbg")})`);
       });
+      this.registerEvents();
     } catch (error) {
       console.error(error);
     }
   }
+  updateCartBadge(count) {
+    this.cartCount.textContent = count;
 
+    this.cartCount.hidden = count === 0;
+  }
+  async addToCart() {
+    try {
+      const quantity = parseInt(this.quantityInput.value, 10) || 1;
+
+      const response = await this.cart.add(this.product.id, quantity);
+      this.updateCartBadge(response.data.cart_count);
+
+      // TODO:
+      // Show toast:
+      // "Added to cart."
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  registerEvents() {
+    this.addToCartButton?.addEventListener("click", () => this.addToCart());
+  }
   renderGallery(images) {
-    console.log(this.galleryNav);
-    console.log(this.galleryPreview);
-    console.log(this.relatedProducts);
     const gallery = this.galleryTemplate.render(images);
 
     Renderer.replace(this.galleryNav, gallery.thumbnails);
@@ -73,8 +108,6 @@ export default class ShopDetails {
   }
 
   renderRelatedProducts(products) {
-    console.log(products);
-
     this.relatedProducts.innerHTML = this.relatedTemplate.render(products);
   }
   renderProduct(product) {
