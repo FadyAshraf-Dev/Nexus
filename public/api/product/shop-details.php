@@ -17,7 +17,9 @@ try {
 
     }
 
-    $productService = new ProductService(Database::connection());
+    $productService = new ProductService(
+        Database::connection()
+    );
 
     $result = $productService->getProductDetails(
         $validator->validated()['slug']
@@ -27,11 +29,12 @@ try {
 
     $sellingPrice = (float) $product['selling_price'];
 
-$displayPrice = Price::calculatePrice(
-    $sellingPrice,
-    $product['discount_type'],
-    $product['discount_value'],
-);
+    $displayPrice = Price::calculatePrice(
+        $sellingPrice,
+        $product['discount_type'],
+        $product['discount_value']
+    );
+
     $relatedProducts = array_map(
 
         static function (array $related): array {
@@ -56,7 +59,7 @@ $displayPrice = Price::calculatePrice(
 
                 'display_price' => round($displayPrice, 2),
 
-                'old_price' => $displayPrice < $sellingPrice
+                'old_price' => $related['discount_type'] !== ''
                     ? round($sellingPrice, 2)
                     : null,
 
@@ -90,7 +93,7 @@ $displayPrice = Price::calculatePrice(
 
             'display_price' => round($displayPrice, 2),
 
-            'old_price' => $displayPrice < $sellingPrice
+            'old_price' => $product['discount_type'] !== ''
                 ? round($sellingPrice, 2)
                 : null,
 

@@ -4447,3 +4447,51 @@ ol {
     z-index:5;
 
 }
+.header__cart {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header__cart-icon {
+    position: relative;
+
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header__cart-icon img {
+    width: 100%;
+    height: auto;
+}
+
+#cart-count {
+
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 13px;
+    font-weight: 800;
+
+    color: #000;
+
+    pointer-events: none;
+
+    user-select: none;
+}
+
+#cart-count[hidden] {
+    display: none;
+}
+#cart-count {
+    transform: translateY(5px);
+}
