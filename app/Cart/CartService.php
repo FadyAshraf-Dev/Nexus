@@ -37,7 +37,7 @@ final class CartService
      * Authenticated users:
      *  - Stored inside the database.
      */
-    public function addItem(
+    public function addToCart(
         int $productId,
         int $quantity = 1
     ): void {
@@ -240,7 +240,7 @@ final class CartService
             $this->cookieCart->read() as $item
         ) {
 
-            $this->addItem(
+            $this->addToCart(
                 (int) $item['product_id'],
                 (int) $item['quantity']
             );
