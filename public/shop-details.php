@@ -109,18 +109,16 @@ require_once dirname(__DIR__, 1) . '/bootstrap/bootstrap.php';
 
                                 <div class="quantity">
 
-                                    <div class="pro-qty">
+                                    <div class="pro-qty" id="quantity-wrapper">
 
-                                        <input type="text" value="1">
-
+                                        <input id="quantity" type="number" value="1" min="1">
                                     </div>
 
                                 </div>
 
-                                <a href="#" class="primary-btn">
-                                    Add to cart
-                                </a>
-
+                                <button id="add-to-cart" class="primary-btn" type="button">
+                                    Add to Cart
+                                </button>
                             </div>
 
                             <div class="product__details__last__option">
@@ -227,10 +225,6 @@ require_once dirname(__DIR__, 1) . '/bootstrap/bootstrap.php';
     <!-- Footer Section Begin -->
     <?php include 'includes/footer.php'; ?>
     <!-- Footer Section End -->
-
-    <!-- Search Begin -->
-    <?php include 'includes/search.php'; ?>
-    <!-- Search End -->
 
     <!-- Js Plugins -->
     <?php include 'includes/scripts.php'; ?>
