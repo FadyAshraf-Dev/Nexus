@@ -1,6 +1,8 @@
 import Ajax from "../../core/Ajax.js";
 import Renderer from "../../core/Renderer.js";
 import Cart from "../../cart/Cart.js";
+import cartBadge from "../../cart/CartBadge.js";
+
 import ShopDetailsGalleryTemplate from "../../templates/ShopDetailsGalleryTemplate.js";
 
 import RelatedProductsTemplate from "../../templates/RelatedProductsTemplate.js";
@@ -48,9 +50,6 @@ export default class ShopDetails {
 
       return;
     }
-    const response = await this.cart.count();
-
-    this.updateCartBadge(response.data.cart_count);
     await this.loadProduct();
   }
 
@@ -77,18 +76,12 @@ export default class ShopDetails {
       console.error(error);
     }
   }
-  updateCartBadge(count) {
-    this.cartCount.textContent = count;
-
-    this.cartCount.hidden = count === 0;
-  }
   async addToCart() {
     try {
       const quantity = parseInt(this.quantityInput.value, 10) || 1;
 
-      const response = await this.cart.add(this.product.id, quantity);
-      this.updateCartBadge(response.data.cart_count);
-
+      await this.cart.add(this.product.id, quantity);
+      await cartBadge.refresh();
       // TODO:
       // Show toast:
       // "Added to cart."

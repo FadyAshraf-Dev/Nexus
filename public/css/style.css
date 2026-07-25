@@ -4495,3 +4495,27 @@ ol {
 #cart-count {
     transform: translateY(5px);
 }
+.shopping__cart__table
+table
+tbody
+tr
+td.product__cart__item
+.product__cart__item__pic {
+    float: left;
+    margin-right: 30px;
+    width: 90px;
+    height: 90px;
+    overflow: hidden;
+}
+
+.shopping__cart__table
+table
+tbody
+tr
+td.product__cart__item
+.product__cart__item__pic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}

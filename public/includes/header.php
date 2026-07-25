@@ -3,7 +3,7 @@
     <div class="header__content">
 
       <div class="header__logo">
-        <a href="index.html">
+        <a href="index.php">
           <span class="header__brand-title">NEXUS</span>
           <span class="header__brand-subtitle">Fashion Marketplace</span>
         </a>

@@ -59,13 +59,13 @@ require_once dirname(__DIR__, 1) . '/bootstrap/bootstrap.php';
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="cart__discount">
+                    <!-- <div class="cart__discount">
                         <h6>Discount codes</h6>
                         <form action="#">
                             <input type="text" placeholder="Coupon code">
                             <button type="submit">Apply</button>
                         </form>
-                    </div>
+                    </div> -->
                     <div class="cart__total">
                         <h6>Cart total</h6>
                         <ul>
@@ -93,6 +93,7 @@ require_once dirname(__DIR__, 1) . '/bootstrap/bootstrap.php';
 
     <!-- Js Plugins -->
     <?php include 'includes/scripts.php'; ?>
+    <script type="module" src="/admin/js/pages/shop/ShoppingCart.js"></script>
 </body>
 
 </html>
