@@ -7,11 +7,14 @@ final class AuthenticationService
     private PDO $pdo;
     private UserRepository $users;
     private Token $token;
+    private CartService $cart;
+    public function __construct(PDO $pdo)
+    {
+        $this->pdo = $pdo;
+        $this->users = new UserRepository($pdo);
+        $this->token = new Token($this->pdo);
+        $this->cart = new CartService($pdo);
 
-    public function __construct(PDO $pdo) {
-    $this->pdo = $pdo;
-    $this->users = new UserRepository($pdo);
-    $this->token = new Token($this->pdo);
     }
 
     /**
@@ -58,9 +61,10 @@ final class AuthenticationService
             'email' => $user['email'],
             'role_id' => $user['role_id'],
         ]);
+        $this->cart->mergeCookieIntoDatabase();
 
         if ($rememberMe) {
-            
+
             $this->token->create(
                 (int) $user['id']
             );

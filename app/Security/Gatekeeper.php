@@ -18,7 +18,7 @@ class Gatekeeper {
             $fallback = $loginRedirect ?? 'login.php';
             
             // Clean, consistent, and handles the exit() internally!
-            Response::redirectAdmin($fallback);
+            Response::redirectBase($fallback);
         }
 
 

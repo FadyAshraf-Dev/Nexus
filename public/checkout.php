@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once dirname(__DIR__, 1) . '/bootstrap/bootstrap.php';
-
+Gatekeeper::authorize([1,2,3]);
 ?>
 <!DOCTYPE html>
 <html lang="zxx">

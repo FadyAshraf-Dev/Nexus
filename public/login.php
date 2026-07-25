@@ -2,6 +2,18 @@
 
 declare(strict_types=1);
 require_once dirname(__DIR__, 1) . '/bootstrap/bootstrap.php';
+if (isset($_SESSION["user"])) {
+    // Traffic control check: Where should an already logged-in user go?
+
+    $userRole = $_SESSION["user"]["role_id"];
+    if ($userRole == 3 || $userRole == 2) {
+        // They are an admin/vendor, kick them straight into the admin dashboard
+        Response::redirectAdmin("index.php");
+    } else {
+        // They are a customer, bounce them back out to the public storefront
+        Response::redirectBase("index.php");
+    }
+}
 
 ?>
 <!DOCTYPE html>
