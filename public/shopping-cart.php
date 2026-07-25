@@ -79,7 +79,7 @@ require_once dirname(__DIR__, 1) . '/bootstrap/bootstrap.php';
                                 <span id="cart-total">$0.00</span>
                             </li>
                         </ul>
-                        <a href="#" class="primary-btn">Proceed to checkout</a>
+                        <a href="checkout.php" class="primary-btn">Proceed to checkout</a>
                     </div>
                 </div>
             </div>

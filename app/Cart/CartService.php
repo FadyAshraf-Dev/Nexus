@@ -7,6 +7,8 @@ final class CartService
 
     private CartRepository $cartRepository;
 
+    private ImageRepository $imageRepository;
+
     private ProductRepository $productRepository;
 
     private CookieCart $cookieCart;
@@ -20,6 +22,9 @@ final class CartService
 
         $this->productRepository =
             new ProductRepository($pdo);
+
+        $this->imageRepository =
+            new ImageRepository($pdo);
 
         $this->cookieCart =
             new CookieCart();
@@ -193,12 +198,13 @@ final class CartService
     public function getCart(): array
     {
         if ($this->isGuest()) {
-            return $this->cookieCart->read();
+            return $this->hydrateCookieCart(
+                $this->cookieCart->read()
+            );
         }
 
         $cartId = $this->getOrCreateCartId();
-        return $this->cartRepository
-            ->findItems($cartId);
+        return $this->cartRepository->findItems($cartId);
     }
     /**
      * Returns the total quantity of items
@@ -328,6 +334,58 @@ final class CartService
         ];
 
         $this->cookieCart->write($cart);
+    }
+    private function hydrateCookieCart(array $cart): array
+    {
+        $items = [];
+
+        foreach ($cart as $cartItem) {
+
+            $productId = (int) $cartItem['product_id'];
+
+            $product = $this->productRepository->findById(
+                $productId
+            );
+
+            if ($product === null) {
+                continue;
+            }
+
+            $images = $this->imageRepository
+                ->findByProduct($productId);
+
+            $imagePath = $images[0]['image_path'] ?? null;
+
+            $items[] = [
+
+                // Cookie items don't exist in cart_items
+                'id' => 0,
+
+                'product_id' => $productId,
+
+                'quantity' => (int) $cartItem['quantity'],
+
+                'product_name' => $product['product_name'],
+
+                'slug' => $product['slug'],
+
+                'selling_price' => (float) $product['selling_price'],
+
+                'discount_type' => $product['discount_type'],
+
+                'discount_value' => (float) (
+                    $product['discount_value'] ?? 0
+                ),
+
+                'stock_quantity' => (int) $product['stock_quantity'],
+
+                'status' => $product['status'],
+
+                'image_path' => $imagePath,
+            ];
+        }
+
+        return $items;
     }
     /**
      * Updates the quantity of a cookie cart item.
