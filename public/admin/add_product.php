@@ -191,7 +191,7 @@ $categories = $categoryRepository->findAll();
                                              class="<?= Errors::has('status') ? 'border border-danger rounded p-2' : '' ?>">
 
                                              <div class="mb-3">
-                                                <label class="small mb-1 d-block required" >Status</label>
+                                                <label class="small mb-1 d-block required">Status</label>
                                                 <?php
                                                 $status = $old['status'] ?? 'active';
                                                 ?>

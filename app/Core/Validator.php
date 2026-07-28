@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 class Validator
 {
-    private ?PDO $pdo = null;
-
-    private function pdo(): PDO
-    {
-        return $this->pdo ??= Database::connection();
-    }
     private array $data;
     private array $errors = [];
 
@@ -19,8 +13,6 @@ class Validator
             fn($value) => is_string($value) ? trim($value) : $value,
             $sourceData
         );
-        $this->pdo = Database::connection();
-
     }
 
     /**
@@ -96,6 +88,70 @@ class Validator
      * Validation Rules
      * -----------------------------
      */
+    private function validateBoolean(
+        string $field,
+        mixed $value
+    ): void {
+
+        if (
+            $value === null ||
+            $value === ''
+        ) {
+            return;
+        }
+
+        $allowed = [
+
+            true,
+            false,
+            1,
+            0,
+            "1",
+            "0",
+            "true",
+            "false"
+
+        ];
+
+        if (!in_array($value, $allowed, true)) {
+
+            $this->errors[$field] =
+                $this->label($field) . ' must be true or false.';
+
+        }
+
+    }
+
+    private function validateRegex(
+        string $field,
+        mixed $value,
+        mixed $parameter
+    ): void {
+
+        if (
+            $value === null ||
+            $value === ''
+        ) {
+            return;
+        }
+
+        if (
+            $parameter === null ||
+            @preg_match((string) $parameter, '') === false
+        ) {
+            throw new InvalidArgumentException(
+                "Invalid regex supplied for '{$field}'."
+            );
+        }
+
+        if (!preg_match((string) $parameter, (string) $value)) {
+
+            $this->errors[$field] =
+                $this->label($field) . ' has an invalid format.';
+
+        }
+
+    }
 
     private function validateRequired(string $field, mixed $value): void
     {
@@ -208,40 +264,6 @@ class Validator
         }
 
         $this->validateRequired($field, $value);
-    }
-
-    private function validateExists(
-        string $field,
-        mixed $value,
-        mixed $parameter
-    ): void {
-
-        if (
-            $value === null ||
-            $value === ''
-        ) {
-            return;
-        }
-
-        [$table, $column] = explode(',', (string) $parameter, 2);
-        $sql = sprintf(
-            "SELECT 1
-         FROM `%s`
-         WHERE `%s` = :value
-         LIMIT 1",
-            $table,
-            $column
-        );
-
-        $statement = $this->pdo()->prepare($sql);
-        $statement->execute([
-            'value' => $value
-        ]);
-
-        if (!$statement->fetchColumn()) {
-            $this->errors[$field] =
-                $this->label($field) . ' does not exist.';
-        }
     }
 
     /**
