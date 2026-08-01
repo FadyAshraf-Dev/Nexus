@@ -24,7 +24,7 @@ class Validator
 
             $value = $this->data[$field] ?? null;
 
-            foreach (explode('|', $ruleString) as $rule) {
+            foreach ($this->splitRuleString($ruleString) as $rule) {
 
                 $parameter = null;
                 if (
@@ -271,6 +271,70 @@ class Validator
      * Helpers
      * -----------------------------
      */
+
+    /**
+     * Splits a pipe-delimited rule string into individual rule tokens.
+     *
+     * A plain explode('|', $ruleString) breaks whenever a regex: rule's
+     * own pattern contains a | (e.g. alternation like (010|011)), since
+     * that | gets mistaken for a rule separator. This walks the string
+     * once and treats a regex:/pattern/flags segment as opaque, only
+     * splitting on | outside of it.
+     *
+     * Assumes PCRE delimiters where the opening and closing delimiter
+     * are the same character (the common /pattern/ form used throughout
+     * this app). Bracket-style delimiters like (...), {...}, [...] are
+     * not handled, since no rule in this app currently uses them.
+     */
+    private function splitRuleString(string $ruleString): array
+    {
+        $tokens = [];
+        $length = strlen($ruleString);
+        $start = 0;
+        $i = 0;
+
+        while ($i < $length) {
+
+            if (
+                substr($ruleString, $i, 6) === 'regex:'
+                && $i + 6 < $length
+            ) {
+
+                $delimiter = $ruleString[$i + 6];
+                $i += 7; // past "regex:" + opening delimiter
+
+                while ($i < $length && $ruleString[$i] !== $delimiter) {
+                    $i++;
+                }
+
+                if ($i < $length) {
+                    $i++; // consume closing delimiter
+                }
+
+                // Consume trailing regex flags (e.g. u, i, m).
+                while ($i < $length && ctype_alpha($ruleString[$i])) {
+                    $i++;
+                }
+
+                continue;
+
+            }
+
+            if ($ruleString[$i] === '|') {
+                $tokens[] = substr($ruleString, $start, $i - $start);
+                $i++;
+                $start = $i;
+                continue;
+            }
+
+            $i++;
+
+        }
+
+        $tokens[] = substr($ruleString, $start);
+
+        return $tokens;
+    }
 
     private function resolveRuleArgument(?string $parameter): mixed
     {
