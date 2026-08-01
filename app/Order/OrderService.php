@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use PDO;
-use Throwable;
 
 final class OrderService
 {
@@ -11,6 +9,7 @@ final class OrderService
     private CartRepository $cartRepository;
     private ProductRepository $productRepository;
     private OrderRepository $orderRepository;
+    private CouponService $couponService;
 
     public function __construct(
         private readonly PDO $pdo,
@@ -20,6 +19,13 @@ final class OrderService
 
         $this->productRepository =
             new ProductRepository($pdo);
+        $this->orderRepository =
+            new OrderRepository($pdo);
+
+        // Same PDO instance, so applyCoupon()/incrementUsage() below
+        // run inside this method's transaction, not a separate one.
+        $this->couponService =
+            new CouponService($pdo);
 
     }
 
@@ -31,7 +37,8 @@ final class OrderService
     public function placeOrder(
         int $userId,
         string $address,
-        string $phone
+        string $phone,
+        ?string $couponCode=null,
     ): int {
 
         $cart = $this->cartRepository->findCartByUserId($userId);
@@ -112,7 +119,27 @@ final class OrderService
 
             $shippingPrice = self::DEFAULT_SHIPPING_PRICE;
 
-            $totalPrice = $subtotal + $shippingPrice;
+            $couponId = null;
+
+            $discountAmount = 0.0;
+
+            if ($couponCode !== null && trim($couponCode) !== '') {
+
+                $result = $this->couponService->applyCoupon(
+                    $couponCode,
+                    $subtotal
+                );
+
+                $couponId = (int) $result["coupon"]["id"];
+
+                $discountAmount = (float) $result["discount"];
+
+            }
+
+            $totalPrice = max(
+                0.0,
+                $subtotal + $shippingPrice - $discountAmount
+            );
 
             $orderId = $this->orderRepository->createOrder([
 
@@ -124,7 +151,11 @@ final class OrderService
 
                 "phone" => $phone,
 
+                "coupon_id" => $couponId,
+
                 "shipping_price" => $shippingPrice,
+
+                "discount_amount" => $discountAmount,
 
                 "total_price" => $totalPrice
 
@@ -141,6 +172,10 @@ final class OrderService
             $this->orderRepository->createOrderItems(
                 $orderItems
             );
+
+            if ($couponId !== null) {
+                $this->couponService->incrementUsage($couponId);
+            }
 
             $this->cartRepository->clearCart(
                 (int) $cart["id"]

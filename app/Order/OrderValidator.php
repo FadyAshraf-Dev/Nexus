@@ -11,7 +11,8 @@ final class OrderValidator
 
                 'address' => 'required|min_len:10|max_len:255|regex:/^[\p{L}\p{N}\s,\.\-\/#()]{10,255}$/u',
 
-                'phone' => 'required|regex:/^(010|011|012|015)\d{8}$/',
+                'phone' => 'required|regex:/^01[0125]\d{8}$/',
+                'coupon_code' => 'nullable|max_len:50'
 
             ]);
     }

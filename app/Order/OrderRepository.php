@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use PDO;
 
 class OrderRepository
 {
@@ -18,7 +17,9 @@ class OrderRepository
                 status,
                 address,
                 phone,
+                coupon_id,
                 shipping_price,
+                discount_amount,
                 total_price
             )
             VALUES
@@ -27,7 +28,9 @@ class OrderRepository
                 :status,
                 :address,
                 :phone,
+                :coupon_id,
                 :shipping_price,
+                :discount_amount,
                 :total_price
             )
             "
@@ -39,7 +42,9 @@ class OrderRepository
             "status" => $order["status"],
             "address" => $order["address"],
             "phone" => $order["phone"],
+            "coupon_id" => $order["coupon_id"] ?? null,
             "shipping_price" => $order["shipping_price"],
+            "discount_amount" => $order["discount_amount"] ?? 0.00,
             "total_price" => $order["total_price"]
 
         ]);
