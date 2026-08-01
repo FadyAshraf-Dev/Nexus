@@ -15,6 +15,7 @@ spl_autoload_register(function (string $class): void {
         ROOT_PATH . '/app/Users/',
         ROOT_PATH . '/app/Helpers/',
         ROOT_PATH . '/app/Order/',
+        ROOT_PATH . '/app/Coupon/',
     ];
     foreach ($directories as $directory) {
 
