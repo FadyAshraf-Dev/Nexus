@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__, 3) . '/bootstrap/bootstrap.php';
 
-Gatekeeper::authorize([1]);
+Gatekeeper::authorize([1,2,3]);
 
 try {
 
@@ -34,7 +34,9 @@ try {
 
         $validated["address"],
 
-        $validated["phone"]
+        $validated["phone"],
+
+        $validated["coupon_code"] ?? null
 
     );
 
@@ -60,15 +62,13 @@ try {
 
 } catch (Throwable $exception) {
 
-    error_log($exception);
+    error_log($exception->getMessage());
 
     Response::json([
 
         "success" => false,
 
-        "message" =>
-            "An unexpected error occurred."
-
+        "message" => $exception->getMessage(),
     ], 500);
 
 }
