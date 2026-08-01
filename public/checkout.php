@@ -236,7 +236,7 @@ Gatekeeper::authorize([1, 2, 3]);
   <?php include 'includes/footer.php'; ?>
 
   <?php include 'includes/scripts.php'; ?>
-  <script type="module" src="/admin/js/pages/shop/Checkout.js"></script>
+  <script type="module" src="/admin/js/pages/checkout/Checkout.js"></script>
 </body>
 
 </html>
