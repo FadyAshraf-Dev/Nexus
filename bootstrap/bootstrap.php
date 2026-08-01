@@ -44,7 +44,7 @@ if (Session::guest()) {
          * user stays logged out.
          */
 
-        error_log($e);
+        error_log($e->getMessage());
 
     }
 
