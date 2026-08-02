@@ -38,7 +38,7 @@ export default class CheckoutSubmission {
             return false;
         }
 
-        Navigation.redirect(`/order-success.php?id=${response.order_id}`);
+        Navigation.redirect(`/order-success.php?id=${response.order_id}&fresh=1`);
         return true;
 
     }
