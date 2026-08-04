@@ -106,4 +106,24 @@ final class UserRepository extends Repository
 
         return $user ?: null;
     }
+
+    public function findIdsByRole(int $roleId): array
+    {
+        $sql = "
+            SELECT id
+            FROM users
+            WHERE role_id = :role_id
+        ";
+
+        $statement = $this->prepare($sql);
+
+        $statement->execute([
+            'role_id' => $roleId,
+        ]);
+
+        return array_map(
+            'intval',
+            $statement->fetchAll(PDO::FETCH_COLUMN)
+        );
+    }
 }
