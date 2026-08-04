@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 final class OrderService
 {
     public const DEFAULT_SHIPPING_PRICE = 50.00;
@@ -10,6 +9,8 @@ final class OrderService
     private ProductRepository $productRepository;
     private OrderRepository $orderRepository;
     private CouponService $couponService;
+    private ProductService $productService;
+    private NotificationService $notificationService;
 
     public function __construct(
         private readonly PDO $pdo,
@@ -26,6 +27,14 @@ final class OrderService
         // run inside this method's transaction, not a separate one.
         $this->couponService =
             new CouponService($pdo);
+
+        // Same reasoning - stock decrements must be inside this
+        // transaction, so a rollback also reverts them.
+        $this->productService =
+            new ProductService($pdo);
+
+        $this->notificationService =
+            new NotificationService($pdo);
 
     }
 
@@ -173,6 +182,31 @@ final class OrderService
                 $orderItems
             );
 
+            $lowStockCrossings = [];
+
+            foreach ($orderItems as $item) {
+
+                $fulfillment = $this->productService->fulfillOrderItem(
+                    $item["product_id"],
+                    $item["quantity"]
+                );
+
+                if (!$fulfillment["success"]) {
+                    // Stock changed between the earlier read-based check
+                    // and this atomic decrement (e.g. a concurrent order
+                    // beat this one to the last units). Fail the whole
+                    // order rather than sell something we don't have.
+                    throw new RuntimeException(
+                        "{$fulfillment['product']['product_name']} no longer has enough stock."
+                    );
+                }
+
+                if ($fulfillment["crossed_threshold"]) {
+                    $lowStockCrossings[] = $fulfillment["product"];
+                }
+
+            }
+
             if ($couponId !== null) {
                 $this->couponService->incrementUsage($couponId);
             }
@@ -182,6 +216,12 @@ final class OrderService
             );
 
             $this->pdo->commit();
+
+            // Notifications are best-effort and intentionally happen
+            // AFTER commit(): if notification insertion failed inside
+            // the transaction, it would roll back a successfully placed
+            // order over what is genuinely a non-critical side effect.
+            $this->sendOrderNotifications($orderId, $userId, $lowStockCrossings);
 
             return $orderId;
 
@@ -194,6 +234,39 @@ final class OrderService
         }
 
     }
+
+    /**
+     * Sends order-related notifications. Called AFTER the order
+     * transaction has already committed - failures here are logged,
+     * never thrown, since a notification problem must not look like a
+     * failed order to the customer who already successfully checked out.
+     *
+     * $userId (the purchaser) is accepted for symmetry/future use (e.g.
+     * a "your order shipped" notification back to the buyer) even
+     * though today's triggers only notify admins/vendors, not the buyer.
+     */
+    private function sendOrderNotifications(
+        int $orderId,
+        int $userId,
+        array $lowStockCrossings
+    ): void {
+
+        try {
+
+            $this->notificationService->notifyAdminsOfNewOrder($orderId);
+
+            foreach ($lowStockCrossings as $product) {
+                $this->notificationService->notifyVendorOfLowStock($product);
+            }
+
+        } catch (Throwable $exception) {
+
+            error_log((string) $exception);
+
+        }
+
+    }
+
     public function findOrder(
         int $orderId
     ): ?array {
@@ -207,8 +280,34 @@ final class OrderService
         int $userId
     ): array {
 
-        return $this->orderRepository
+        $orders = $this->orderRepository
             ->findUserOrders($userId);
+
+        if (empty($orders)) {
+            return [];
+        }
+
+        $orderIds = array_map(
+            static fn(array $order): int => (int) $order["id"],
+            $orders
+        );
+
+        $items = $this->orderRepository
+            ->findItemsForOrders($orderIds);
+
+        $itemsByOrder = [];
+
+        foreach ($items as $item) {
+            $itemsByOrder[(int) $item["order_id"]][] = $item;
+        }
+
+        foreach ($orders as &$order) {
+            $order["items"] = $itemsByOrder[(int) $order["id"]] ?? [];
+        }
+
+        unset($order);
+
+        return $orders;
 
     }
 
