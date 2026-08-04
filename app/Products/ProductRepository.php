@@ -108,6 +108,30 @@ final class ProductRepository extends Repository
 
     }
 
+    public function decrementStock(
+        int $productId,
+        int $quantity
+    ): bool {
+
+        $sql = "
+            UPDATE products
+            SET stock_quantity = stock_quantity - :quantity
+            WHERE id = :id
+              AND deleted_at IS NULL
+              AND stock_quantity >= :quantity
+        ";
+
+        $statement = $this->prepare($sql);
+
+        $statement->execute([
+            'id' => $productId,
+            'quantity' => $quantity,
+        ]);
+
+        return $statement->rowCount() === 1;
+
+    }
+
     public function findById(int $productId): ?array
     {
         $sql = "SELECT * from products WHERE id = :id AND deleted_at IS NULL Limit 1";

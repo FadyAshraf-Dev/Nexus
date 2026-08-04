@@ -169,34 +169,80 @@ class ProductService
             'filters' => $filters,
         ];
     }
-public function getProductDetails(string $slug): array
-{
-    $product = $this->productRepository->findBySlug($slug);
+    public function getProductDetails(string $slug): array
+    {
+        $product = $this->productRepository->findBySlug($slug);
 
-    if (!$product) {
-        throw new RuntimeException('Product not found.');
+        if (!$product) {
+            throw new RuntimeException('Product not found.');
+        }
+
+        $images = $this->imageService->findByProduct(
+            (int) $product['id']
+        );
+
+        $relatedProducts = $this->productRepository->findRelatedProducts(
+            (int) $product['category_id'],
+            (int) $product['id']
+        );
+
+        return [
+
+            'product' => [
+                ...$product,
+                'images' => $images,
+            ],
+
+            'related_products' => $relatedProducts,
+
+        ];
     }
 
-    $images = $this->imageService->findByProduct(
-        (int) $product['id']
-    );
+    public function fulfillOrderItem(
+        int $productId,
+        int $quantity
+    ): array {
 
-    $relatedProducts = $this->productRepository->findRelatedProducts(
-        (int) $product['category_id'],
-        (int) $product['id']
-    );
+        $productBefore = $this->productRepository->findById($productId);
 
-    return [
+        if ($productBefore === null) {
+            throw new RuntimeException(
+                "Product #{$productId} not found while fulfilling order."
+            );
+        }
 
-        'product' => [
-            ...$product,
-            'images' => $images,
-        ],
+        $decremented = $this->productRepository->decrementStock(
+            $productId,
+            $quantity
+        );
 
-        'related_products' => $relatedProducts,
+        if (!$decremented) {
+            return [
+                'success' => false,
+                'crossed_threshold' => false,
+                'product' => $productBefore,
+            ];
+        }
 
-    ];
-}    private function generateUniqueSlug(
+        $threshold = $productBefore['low_stock_threshold'];
+
+        $stockBefore = (int) $productBefore['stock_quantity'];
+        $stockAfter = $stockBefore - $quantity;
+
+        $crossedThreshold =
+            $threshold !== null
+            && $stockBefore > (int) $threshold
+            && $stockAfter <= (int) $threshold;
+
+        return [
+            'success' => true,
+            'crossed_threshold' => $crossedThreshold,
+            'product' => $productBefore,
+        ];
+
+    }
+
+    private function generateUniqueSlug(
         int $vendorId,
         string $productName,
         ?int $ignoreProductId = null
