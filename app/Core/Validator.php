@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 class Validator
 {
+    private ?PDO $pdo = null;
+
+    private function pdo(): PDO
+    {
+        return $this->pdo ??= Database::connection();
+    }
+
     private array $data;
     private array $errors = [];
 
@@ -13,6 +20,8 @@ class Validator
             fn($value) => is_string($value) ? trim($value) : $value,
             $sourceData
         );
+        $this->pdo = Database::connection();
+
     }
 
     /**
@@ -367,6 +376,40 @@ class Validator
 
         $this->errors[$field] = $message;
 
+    }
+
+    private function validateExists(
+        string $field,
+        mixed $value,
+        mixed $parameter
+    ): void {
+
+        if (
+            $value === null ||
+            $value === ''
+        ) {
+            return;
+        }
+
+        [$table, $column] = explode(',', (string) $parameter, 2);
+        $sql = sprintf(
+            "SELECT 1
+         FROM `%s`
+         WHERE `%s` = :value
+         LIMIT 1",
+            $table,
+            $column
+        );
+
+        $statement = $this->pdo()->prepare($sql);
+        $statement->execute([
+            'value' => $value
+        ]);
+
+        if (!$statement->fetchColumn()) {
+            $this->errors[$field] =
+                $this->label($field) . ' does not exist.';
+        }
     }
 
 }
