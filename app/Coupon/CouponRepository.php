@@ -193,4 +193,100 @@ class CouponRepository extends Repository
 
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Counts coupons for the admin listing, matching the same filters
+     * findForListing applies - kept in sync so the count and the
+     * actual page always agree on what matches.
+     */
+    public function countForListing(?string $status = null): int
+    {
+        $sql = "
+            SELECT COUNT(*) AS total
+            FROM coupons
+            WHERE deleted_at IS NULL
+        ";
+
+        $parameters = [];
+
+        if ($status !== null && $status !== '') {
+            $sql .= " AND status = :status";
+            $parameters['status'] = $status;
+        }
+
+        $statement = $this->pdo->prepare($sql);
+        $statement->execute($parameters);
+
+        return (int) $statement->fetchColumn();
+    }
+
+    /**
+     * Paginated, filterable coupon listing for admin management.
+     * Soft-deleted coupons are never shown here (unlike reviews'
+     * moderation table, which intentionally shows hidden ones too, so
+     * they can be restored) - there is no "restore a deleted coupon"
+     * feature, so excluding them entirely is correct here.
+     */
+    public function findForListing(
+        int $limit,
+        int $offset,
+        ?string $status = null
+    ): array {
+
+        $sql = "
+            SELECT *
+            FROM coupons
+            WHERE deleted_at IS NULL
+        ";
+
+        $parameters = [];
+
+        if ($status !== null && $status !== '') {
+            $sql .= " AND status = :status";
+            $parameters['status'] = $status;
+        }
+
+        $sql .= "
+            ORDER BY created_at DESC
+            LIMIT :limit
+            OFFSET :offset
+        ";
+
+        $statement = $this->pdo->prepare($sql);
+
+        foreach ($parameters as $key => $value) {
+            $statement->bindValue(":{$key}", $value);
+        }
+
+        $statement->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $statement->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $statement->execute();
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Toggles a coupon between active/inactive - the admin listing's
+     * quick status action, separate from the full update() (which
+     * requires every field, same reasoning as ProductRepository's
+     * narrow updateRating vs its full update()).
+     */
+    public function updateStatus(int $id, string $status): bool
+    {
+        $sql = "
+            UPDATE coupons
+            SET status = :status
+            WHERE id = :id
+              AND deleted_at IS NULL
+        ";
+
+        $statement = $this->prepare($sql);
+
+        $statement->execute([
+            'id' => $id,
+            'status' => $status,
+        ]);
+
+        return $statement->rowCount() === 1;
+    }
 }

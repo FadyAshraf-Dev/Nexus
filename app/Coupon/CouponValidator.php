@@ -4,6 +4,33 @@ declare(strict_types=1);
 
 final class CouponValidator
 {
+    public const ALLOWED_PAGE_SIZES = [
+        10,
+        20,
+        50,
+    ];
+
+    public const ALLOWED_STATUSES = [
+        'active',
+        'inactive',
+    ];
+
+    public static function validateListing(array $input): Validator
+    {
+        return (new Validator($input))
+            ->validate([
+
+                'page' => 'nullable|integer|min:1',
+
+                'per_page' => 'nullable|integer|in:' .
+                    implode(',', self::ALLOWED_PAGE_SIZES),
+
+                'status' => 'nullable|in:' .
+                    implode(',', self::ALLOWED_STATUSES),
+
+            ]);
+    }
+
     public static function validateApply(array $input): Validator
     {
         $validator = (new Validator($input))->validate([

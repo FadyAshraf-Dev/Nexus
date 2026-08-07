@@ -114,6 +114,93 @@ final class CouponService
             ->incrementUsage($couponId);
     }
 
+    /**
+     * Paginated, filterable coupon listing for admin management.
+     * Mirrors ReviewService::getForModeration's pattern, including the
+     * careful filter extraction: `(int) $x ?? default` is NOT safe here
+     * (cast binds tighter than ??, so it casts a missing/null value
+     * before the coalesce ever runs) - values are checked with isset()
+     * before any cast is applied.
+     */
+    public function getForListing(array $filters): array
+    {
+        $status = $filters['status'] ?? null;
+
+        $page = isset($filters['page']) && $filters['page'] !== ''
+            ? (int) $filters['page']
+            : 1;
+
+        $perPage = isset($filters['per_page']) && $filters['per_page'] !== ''
+            ? (int) $filters['per_page']
+            : 10;
+
+        $totalCoupons = $this->couponRepository->countForListing($status);
+
+        $pagination = $this->calculatePagination(
+            $page,
+            $perPage,
+            $totalCoupons
+        );
+
+        $coupons = $this->couponRepository->findForListing(
+            $pagination['per_page'],
+            $pagination['offset'],
+            $status
+        );
+
+        return [
+            'coupons' => $coupons,
+            'pagination' => $pagination,
+        ];
+
+    }
+
+    /**
+     * Toggles a coupon's active/inactive status - distinct from
+     * deleteCoupon(), which soft-deletes it entirely. A coupon can be
+     * temporarily disabled (status = inactive) without losing it.
+     */
+    public function toggleStatus(int $couponId): void
+    {
+        $coupon = $this->couponRepository->findById($couponId);
+
+        if ($coupon === null) {
+            throw new RuntimeException("Coupon not found.");
+        }
+
+        $newStatus = $coupon['status'] === 'active' ? 'inactive' : 'active';
+
+        $this->couponRepository->updateStatus($couponId, $newStatus);
+
+    }
+
+    private function calculatePagination(
+        int $page,
+        int $perPage,
+        int $totalItems
+    ): array {
+
+        $totalPages = max(
+            1,
+            (int) ceil($totalItems / $perPage)
+        );
+
+        $page = min($page, $totalPages);
+
+        $offset = ($page - 1) * $perPage;
+
+        return [
+            'current_page' => $page,
+            'per_page' => $perPage,
+            'offset' => $offset,
+            'total_products' => $totalItems,
+            'total_pages' => $totalPages,
+            'has_previous' => $page > 1,
+            'has_next' => $page < $totalPages,
+        ];
+
+    }
+
     // --------------------------------------------------
     // Private Helpers
     // --------------------------------------------------
