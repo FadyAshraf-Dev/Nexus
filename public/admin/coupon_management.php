@@ -1,0 +1,111 @@
+<?php
+declare(strict_types=1);
+require_once dirname(__DIR__, 2) . '/bootstrap/bootstrap.php';
+Gatekeeper::authorize([Role::ADMIN]);
+require 'includes/head.php';
+$userRole = Session::roleId();
+
+?>
+
+<body class="nav-fixed">
+	<?php require 'includes/navbar.php'; ?>
+	<div id="layoutSidenav">
+		<?php require 'includes/sidebar.php'; ?>
+		<div id="layoutSidenav_content">
+			<main>
+				<header class="page-header page-header-dark bg-gradient-primary-to-secondary pb-10">
+					<div class="container-xl px-4">
+						<div class="page-header-content pt-4">
+							<div class="row align-items-center justify-content-between">
+								<div class="col-auto mt-4">
+									<h1 class="page-header-title">
+										<div class="page-header-icon"><i data-feather="tag"></i></div>
+										Coupons
+									</h1>
+									<div class="page-header-subtitle">Manage discount coupons</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</header>
+				<!-- Main page content-->
+				<div class="container-xl px-4 mt-n10">
+
+					<div class="card mb-4">
+
+						<div class="card-header d-flex justify-content-between align-items-center">
+
+							<div>
+								<i data-feather="tag" class="me-2"></i>
+								Coupon Management
+							</div>
+
+						</div>
+
+						<div class="card-body">
+							<!-- Coupons Toolbar -->
+							<div class="coupons-toolbar d-flex align-items-center gap-2 mb-4">
+
+								<select id="statusFilter" class="form-select" style="max-width: 180px;">
+									<option value="">All statuses</option>
+									<option value="active">Active</option>
+									<option value="inactive">Inactive</option>
+								</select>
+
+							</div>
+							<div class="table-responsive">
+
+								<table id="couponsTable" class="table table-hover align-middle">
+
+									<thead>
+
+										<tr>
+
+											<th>Code</th>
+
+											<th>Type</th>
+
+											<th>Value</th>
+
+											<th>Usage</th>
+
+											<th>Window</th>
+
+											<th>Status</th>
+
+											<th class="text-end">
+												Actions
+											</th>
+
+										</tr>
+
+									</thead>
+
+									<tbody id="couponsTableBody">
+
+										<!-- Renderer inserts rows -->
+
+									</tbody>
+
+								</table>
+
+							</div>
+							<div id="paginationContainer" class="mt-4">
+
+								<!-- PaginationTemplate -->
+
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+			</main>
+			<?php require 'includes/footer.php'; ?>
+		</div>
+	</div>
+	<?php require 'includes/scripts.php'; ?>
+	<script type="module" src="<?= Asset::admin('js/pages/coupons/CouponManagement.js') ?>"></script>
+</body>
+
+</html>
