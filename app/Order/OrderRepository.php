@@ -88,6 +88,61 @@ class OrderRepository
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Fetches order_items (joined with product name/image) for multiple
+     * orders in a single query, to avoid N+1 when rendering an order list
+     * that shows item thumbnails per order.
+     *
+     * Returns a flat array; each row includes order_id so the caller can
+     * group them.
+     */
+    public function findItemsForOrders(array $orderIds): array
+    {
+        if (empty($orderIds)) {
+            return [];
+        }
+
+        $placeholders = implode(
+            ',',
+            array_fill(0, count($orderIds), '?')
+        );
+
+        $statement = $this->pdo->prepare(
+            "
+            SELECT
+                oi.id,
+                oi.order_id,
+                oi.product_id,
+                oi.quantity,
+                oi.price,
+
+                p.product_name,
+                p.slug,
+
+                (
+                    SELECT image_path
+                    FROM product_images
+                    WHERE product_id = p.id
+                    ORDER BY sort_order
+                    LIMIT 1
+                ) AS image_path
+
+            FROM order_items oi
+
+            LEFT JOIN products p
+                ON p.id = oi.product_id
+
+            WHERE oi.order_id IN ({$placeholders})
+
+            ORDER BY oi.order_id ASC, oi.id ASC
+            "
+        );
+
+        $statement->execute($orderIds);
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function updateOrderStatus(
         int $orderId,
         string $status
@@ -157,9 +212,31 @@ class OrderRepository
     {
         $statement = $this->pdo->prepare(
             "
-            SELECT *
-            FROM order_items
-            WHERE order_id = :order_id
+            SELECT
+                oi.id,
+                oi.product_id,
+                oi.quantity,
+                oi.price,
+
+                p.product_name,
+                p.slug,
+
+                (
+                    SELECT image_path
+                    FROM product_images
+                    WHERE product_id = p.id
+                    ORDER BY sort_order
+                    LIMIT 1
+                ) AS image_path
+
+            FROM order_items oi
+
+            LEFT JOIN products p
+                ON p.id = oi.product_id
+
+            WHERE oi.order_id = :order_id
+
+            ORDER BY oi.id ASC
             "
         );
 
@@ -186,5 +263,59 @@ class OrderRepository
             $this->findOrderItems($orderId);
 
         return $order;
+    }
+
+    /**
+     * Finds a delivered order_item for this user/product that hasn't
+     * already been reviewed, if one exists.
+     *
+     * This is the core "is this user eligible to review this product"
+     * check - a user can review a product if and only if they have at
+     * least one delivered order containing it, and haven't already used
+     * that specific order_item for a review (the reviews table's unique
+     * constraint on order_item_id is the hard backstop for this; this
+     * query is what lets the API give a clean "not eligible" response
+     * instead of hitting a raw constraint violation).
+     *
+     * Returns the order_item id if eligible, null otherwise.
+     */
+    public function findEligibleOrderItem(
+        int $userId,
+        int $productId
+    ): ?int {
+
+        $statement = $this->pdo->prepare(
+            "
+            SELECT oi.id
+
+            FROM order_items oi
+
+            INNER JOIN orders o
+                ON o.id = oi.order_id
+
+            LEFT JOIN reviews r
+                ON r.order_item_id = oi.id
+                AND r.deleted_at IS NULL
+
+            WHERE o.user_id = :user_id
+              AND oi.product_id = :product_id
+              AND o.status = 'delivered'
+              AND r.id IS NULL
+
+            ORDER BY oi.id ASC
+
+            LIMIT 1
+            "
+        );
+
+        $statement->execute([
+            "user_id" => $userId,
+            "product_id" => $productId,
+        ]);
+
+        $orderItemId = $statement->fetchColumn();
+
+        return $orderItemId !== false ? (int) $orderItemId : null;
+
     }
 }

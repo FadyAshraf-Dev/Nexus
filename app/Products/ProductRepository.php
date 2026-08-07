@@ -89,6 +89,36 @@ final class ProductRepository extends Repository
         $statement = $this->pdo->prepare($sql);
         $statement->execute($productData);
     }
+    /**
+     * Writes the denormalized rating aggregate for a product. This
+     * should ONLY ever be called from ReviewService's centralized
+     * recompute method - never set these columns from anywhere else,
+     * or the cached aggregate will drift from the real review data.
+     */
+    public function updateRating(
+        int $productId,
+        float $avgRating,
+        int $reviewCount
+    ): void {
+
+        $sql = "
+            UPDATE products
+            SET
+                avg_rating = :avg_rating,
+                review_count = :review_count
+            WHERE id = :id
+        ";
+
+        $statement = $this->prepare($sql);
+
+        $statement->execute([
+            'id' => $productId,
+            'avg_rating' => $avgRating,
+            'review_count' => $reviewCount,
+        ]);
+
+    }
+
     public function delete(int $productId): bool
     {
         $sql = "
@@ -108,6 +138,16 @@ final class ProductRepository extends Repository
 
     }
 
+    /**
+     * Atomically decrements stock_quantity for a product.
+     *
+     * The `AND stock_quantity >= :quantity` guard means this can only
+     * succeed if there's still enough stock at the moment the UPDATE
+     * runs - not at the moment the caller last checked. Without it, two
+     * concurrent orders could both pass an earlier read-based check and
+     * both decrement, driving stock negative. Returns false if the
+     * guard fails (not enough stock) or the product doesn't exist.
+     */
     public function decrementStock(
         int $productId,
         int $quantity
@@ -118,7 +158,7 @@ final class ProductRepository extends Repository
             SET stock_quantity = stock_quantity - :quantity
             WHERE id = :id
               AND deleted_at IS NULL
-              AND stock_quantity >= :quantity
+              AND stock_quantity >= :quantity_check
         ";
 
         $statement = $this->prepare($sql);
@@ -126,6 +166,7 @@ final class ProductRepository extends Repository
         $statement->execute([
             'id' => $productId,
             'quantity' => $quantity,
+            'quantity_check' => $quantity,
         ]);
 
         return $statement->rowCount() === 1;
@@ -216,6 +257,8 @@ final class ProductRepository extends Repository
             p.discount_type,
             p.discount_value,
             p.stock_quantity,
+            p.avg_rating,
+            p.review_count,
             p.brand,
             p.category_id,
             c.category_name
