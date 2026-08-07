@@ -2,13 +2,8 @@
 
 declare(strict_types=1);
 
-class CouponRepository
+class CouponRepository extends Repository
 {
-    public function __construct(
-        private readonly PDO $pdo
-    ) {
-    }
-
     /**
      * Create a new coupon.
      */
