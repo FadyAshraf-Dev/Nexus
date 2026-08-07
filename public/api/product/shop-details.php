@@ -99,6 +99,10 @@ try {
 
             'stock_quantity' => (int) $product['stock_quantity'],
 
+            'avg_rating' => round((float) $product['avg_rating'], 2),
+
+            'review_count' => (int) $product['review_count'],
+
             'images' => $product['images'],
 
             'related_products' => $relatedProducts,

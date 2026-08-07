@@ -7,6 +7,8 @@ import ShopDetailsGalleryTemplate from "../../templates/ShopDetailsGalleryTempla
 
 import RelatedProductsTemplate from "../../templates/RelatedProductsTemplate.js";
 
+import Reviews from "../../reviews/Reviews.js";
+
 export default class ShopDetails {
   constructor() {
     this.cart = new Cart();
@@ -67,6 +69,9 @@ export default class ShopDetails {
       this.renderProduct(product);
 
       this.renderRelatedProducts(product.related_products);
+
+      this.reviews = new Reviews(product.id);
+      this.reviews.initialize();
 
       $(".set-bg").each(function () {
         $(this).css("background-image", `url(${$(this).data("setbg")})`);

@@ -4,7 +4,7 @@ export default class PaginationTemplate extends Template {
 
     static WINDOW_SIZE = 5;
 
-    render(pagination) {
+    render(pagination, itemLabel = "products") {
 
         if (pagination.total_pages <= 1) {
             return "";
@@ -14,10 +14,10 @@ export default class PaginationTemplate extends Template {
             <div class="d-flex justify-content-between align-items-center">
 
                 <small class="text-muted">
-                    ${this.summary(pagination)}
+                    ${this.summary(pagination, itemLabel)}
                 </small>
 
-                <nav aria-label="Products pagination">
+                <nav aria-label="Pagination">
 
                     <ul class="pagination pagination-sm mb-0">
 
@@ -38,7 +38,7 @@ export default class PaginationTemplate extends Template {
 
     }
 
-    summary(pagination) {
+    summary(pagination, itemLabel = "products") {
 
         const start =
             pagination.total_products === 0
@@ -58,7 +58,7 @@ export default class PaginationTemplate extends Template {
             <strong>${end}</strong>
             of
             <strong>${pagination.total_products}</strong>
-            products
+            ${this.escape(itemLabel)}
         `;
 
     }
