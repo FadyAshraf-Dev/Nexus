@@ -22,7 +22,7 @@ final class CategoryRepository extends Repository
 
         $statement->execute([
             'category_name' => $data['category_name'],
-            'slug'          => $data['slug'],
+            'slug' => $data['slug'],
         ]);
 
         return $this->lastInsertId();
@@ -40,9 +40,9 @@ final class CategoryRepository extends Repository
         $statement = $this->prepare($sql);
 
         $statement->execute([
-            'id'            => $id,
+            'id' => $id,
             'category_name' => $data['category_name'],
-            'slug'          => $data['slug'],
+            'slug' => $data['slug'],
         ]);
 
         return $statement->rowCount() > 0;
@@ -61,6 +61,16 @@ final class CategoryRepository extends Repository
         ]);
 
         return $statement->rowCount() === 1;
+    }
+
+    public function findAll(): array
+    {
+        $sql = "
+        SELECT *
+        FROM categories
+        ORDER BY category_name ASC";
+
+        return $this->query($sql)->fetchAll();
     }
 
     public function findById(int $id): ?array
@@ -101,14 +111,41 @@ final class CategoryRepository extends Repository
         return $category ?: null;
     }
 
-    public function findAll(): array
-    {
+    public function findCategories(
+        int $limit,
+        int $offset,
+        string $sortBy = 'category_name',
+        string $sortDirection = 'ASC',
+    ): array {
+
+        $sortDirection = strtoupper($sortDirection);
+
+        if (!in_array($sortDirection, ['ASC', 'DESC'], true)) {
+            $sortDirection = 'ASC';
+        }
+
         $sql = "
         SELECT *
         FROM categories
-        ORDER BY category_name ASC";
+        ORDER BY {$sortBy} {$sortDirection}
+        LIMIT :limit
+        OFFSET :offset";
 
-        return $this->query($sql)->fetchAll();
+        $statement = $this->prepare($sql);
+
+        $statement->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $statement->bindValue(':offset', $offset, PDO::PARAM_INT);
+
+        $statement->execute();
+
+        return $statement->fetchAll();
+    }
+
+    public function countCategories(): int
+    {
+        $sql = "SELECT COUNT(*) FROM categories";
+
+        return (int) $this->query($sql)->fetchColumn();
     }
 
     public function exists(int $id): bool
