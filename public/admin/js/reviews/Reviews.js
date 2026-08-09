@@ -245,10 +245,6 @@ export default class Reviews {
 
     async deleteReview(reviewId) {
 
-        if (!confirm("Delete your review?")) {
-            return;
-        }
-
         try {
 
             const response = await Ajax.post("/api/review/delete.php", {
