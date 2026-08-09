@@ -156,12 +156,14 @@ class OrderRepository
             "
         );
 
-        return $statement->execute([
+        $statement->execute([
 
             "status" => $status,
             "id" => $orderId
 
         ]);
+
+        return $statement->rowCount() === 1;
     }
 
     /* =====================================================
@@ -317,5 +319,85 @@ class OrderRepository
 
         return $orderItemId !== false ? (int) $orderItemId : null;
 
+    }
+
+    /**
+     * Counts orders matching admin listing filters. Unlike
+     * findUserOrders (scoped to one customer's own order history),
+     * this is admin-wide - every order, filterable by status.
+     */
+    public function countForAdmin(?string $status = null): int
+    {
+        $sql = "
+            SELECT COUNT(*) AS total
+            FROM orders
+            WHERE 1 = 1
+        ";
+
+        $parameters = [];
+
+        if ($status !== null && $status !== '') {
+            $sql .= " AND status = :status";
+            $parameters['status'] = $status;
+        }
+
+        $statement = $this->pdo->prepare($sql);
+        $statement->execute($parameters);
+
+        return (int) $statement->fetchColumn();
+    }
+
+    /**
+     * Paginated, filterable order listing for admin management, joined
+     * to users for customer display context (email/username).
+     */
+    public function findForAdmin(
+        int $limit,
+        int $offset,
+        ?string $status = null
+    ): array {
+
+        $sql = "
+            SELECT
+                o.id,
+                o.user_id,
+                o.status,
+                o.address,
+                o.phone,
+                o.total_price,
+                o.created_at,
+                COALESCE(u.username, u.email) AS customer_name
+
+            FROM orders o
+
+            INNER JOIN users u ON u.id = o.user_id
+
+            WHERE 1 = 1
+        ";
+
+        $parameters = [];
+
+        if ($status !== null && $status !== '') {
+            $sql .= " AND o.status = :status";
+            $parameters['status'] = $status;
+        }
+
+        $sql .= "
+            ORDER BY o.created_at DESC
+            LIMIT :limit
+            OFFSET :offset
+        ";
+
+        $statement = $this->pdo->prepare($sql);
+
+        foreach ($parameters as $key => $value) {
+            $statement->bindValue(":{$key}", $value);
+        }
+
+        $statement->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $statement->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $statement->execute();
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 }

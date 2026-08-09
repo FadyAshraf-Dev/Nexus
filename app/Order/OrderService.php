@@ -323,4 +323,71 @@ final class OrderService
             );
 
     }
+
+    /**
+     * Paginated, filterable order listing for admin management. Mirrors
+     * ReviewService::getForModeration / CouponService::getForListing's
+     * pattern, including the careful filter extraction (isset() checks
+     * before casting, since `(int) $x ?? default` casts before the
+     * coalesce ever runs - see ReviewService for the full explanation).
+     */
+    public function getForAdmin(array $filters): array
+    {
+        $status = $filters['status'] ?? null;
+
+        $page = isset($filters['page']) && $filters['page'] !== ''
+            ? (int) $filters['page']
+            : 1;
+
+        $perPage = isset($filters['per_page']) && $filters['per_page'] !== ''
+            ? (int) $filters['per_page']
+            : 10;
+
+        $totalOrders = $this->orderRepository->countForAdmin($status);
+
+        $pagination = $this->calculatePagination(
+            $page,
+            $perPage,
+            $totalOrders
+        );
+
+        $orders = $this->orderRepository->findForAdmin(
+            $pagination['per_page'],
+            $pagination['offset'],
+            $status
+        );
+
+        return [
+            'orders' => $orders,
+            'pagination' => $pagination,
+        ];
+
+    }
+
+    private function calculatePagination(
+        int $page,
+        int $perPage,
+        int $totalItems
+    ): array {
+
+        $totalPages = max(
+            1,
+            (int) ceil($totalItems / $perPage)
+        );
+
+        $page = min($page, $totalPages);
+
+        $offset = ($page - 1) * $perPage;
+
+        return [
+            'current_page' => $page,
+            'per_page' => $perPage,
+            'offset' => $offset,
+            'total_products' => $totalItems,
+            'total_pages' => $totalPages,
+            'has_previous' => $page > 1,
+            'has_next' => $page < $totalPages,
+        ];
+
+    }
 }
