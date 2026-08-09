@@ -11,7 +11,7 @@ Gatekeeper::authorize([
 
 ]);
 
-$userRole = 3;
+$userRole = Session::roleId();
 
 require 'includes/head.php';
 ?>

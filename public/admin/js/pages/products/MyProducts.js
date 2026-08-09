@@ -38,10 +38,10 @@ class MyProducts {
     await this.refresh();
   }
 
-  async refresh() {
+  async refresh(force = false) {
     try {
       const query = new URLSearchParams(this.filters).toString();
-      if (query === this.previousRequest) {
+      if (query === this.previousRequest && !force) {
         return;
       }
       Renderer.showLoading(this.tbody);
