@@ -30,10 +30,10 @@ class CouponManagement {
     await this.refresh();
   }
 
-  async refresh() {
+  async refresh(force = false) {
     try {
       const query = new URLSearchParams(this.filters).toString();
-      if (query === this.previousRequest) {
+      if (query === this.previousRequest && !force) {
         return;
       }
       Renderer.showLoading(this.tbody);
@@ -136,7 +136,7 @@ class CouponManagement {
         return;
       }
 
-      await this.refresh();
+      await this.refresh(true);
     } catch (error) {
       console.error(error);
       alert(error.message ?? "Action failed.");
@@ -144,10 +144,6 @@ class CouponManagement {
   }
 
   async deleteCoupon(couponId) {
-    if (!confirm("Delete this coupon? This cannot be undone.")) {
-      return;
-    }
-
     try {
       const response = await Ajax.post("/admin/api/coupon/delete.php", {
         id: couponId,
@@ -158,7 +154,7 @@ class CouponManagement {
         return;
       }
 
-      await this.refresh();
+      await this.refresh(true);
     } catch (error) {
       console.error(error);
       alert(error.message ?? "Action failed.");

@@ -38,10 +38,10 @@ class ReviewManagement {
     await this.refresh();
   }
 
-  async refresh() {
+  async refresh(force = false) {
     try {
       const query = new URLSearchParams(this.filters).toString();
-      if (query === this.previousRequest) {
+      if (query === this.previousRequest && !force) {
         return;
       }
       Renderer.showLoading(this.tbody);
@@ -195,7 +195,7 @@ class ReviewManagement {
         return;
       }
 
-      await this.refresh();
+      await this.refresh(true);
     } catch (error) {
       console.error(error);
       alert(error.message ?? "Action failed.");
