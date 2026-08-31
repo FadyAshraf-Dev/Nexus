@@ -48,4 +48,11 @@ return [
         'from_name' => 'Nexus',
     ],
 
+    'password_reset' => [
+        'duration' => '+1 hour',
+    ],
+    'email_verification' => [
+        'duration' => '+1 day',
+    ],
+
 ];
