@@ -276,6 +276,37 @@ class Validator
     }
 
     /**
+     * Confirms $field's value matches another field's value, e.g.
+     * 'password_confirmation' => 'same:password'.
+     *
+     * The other field's *name* is passed as the rule parameter
+     * (same:password), but resolveRuleArgument() already resolves
+     * any parameter that matches a known field name to that
+     * field's current *value* before it reaches here - so
+     * $parameter below is already the value to compare against,
+     * not the field name itself. No lookup needed in this method.
+     *
+     * Skips silently (like the other rules) when this field is
+     * empty, so 'required' is responsible for catching a missing
+     * value - same is only about matching, not presence.
+     */
+    private function validateSame(
+        string $field,
+        mixed $value,
+        mixed $parameter
+    ): void {
+
+        if ($value === null || $value === '') {
+            return;
+        }
+
+        if ($value !== $parameter) {
+            $this->errors[$field] =
+                $this->label($field) . ' must match.';
+        }
+    }
+
+    /**
      * -----------------------------
      * Helpers
      * -----------------------------
