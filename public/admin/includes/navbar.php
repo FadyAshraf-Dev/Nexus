@@ -106,7 +106,7 @@
                 <!-- Example Message 1  -->
                 <a class="dropdown-item dropdown-notifications-item" href="#!">
                     <img class="dropdown-notifications-item-img"
-                        src="assets/img/illustrations/profiles/profile-2.png" />
+                    src="<?= Asset::admin('assets/img/illustrations/profiles/profile-2.png') ?>" />
                     <div class="dropdown-notifications-item-content">
                         <div class="dropdown-notifications-item-content-text">Lorem ipsum dolor sit amet, consectetur
                             adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
@@ -120,7 +120,7 @@
                 <!-- Example Message 2-->
                 <a class="dropdown-item dropdown-notifications-item" href="#!">
                     <img class="dropdown-notifications-item-img"
-                        src="assets/img/illustrations/profiles/profile-3.png" />
+                    src="<?= Asset::admin('assets/img/illustrations/profiles/profile-3.png') ?>" />
                     <div class="dropdown-notifications-item-content">
                         <div class="dropdown-notifications-item-content-text">Lorem ipsum dolor sit amet, consectetur
                             adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
@@ -134,7 +134,7 @@
                 <!-- Example Message 3-->
                 <a class="dropdown-item dropdown-notifications-item" href="#!">
                     <img class="dropdown-notifications-item-img"
-                        src="assets/img/illustrations/profiles/profile-4.png" />
+                    src="<?= Asset::admin('assets/img/illustrations/profiles/profile-4.png') ?>" />
                     <div class="dropdown-notifications-item-content">
                         <div class="dropdown-notifications-item-content-text">Lorem ipsum dolor sit amet, consectetur
                             adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
@@ -148,7 +148,7 @@
                 <!-- Example Message 4-->
                 <a class="dropdown-item dropdown-notifications-item" href="#!">
                     <img class="dropdown-notifications-item-img"
-                        src="assets/img/illustrations/profiles/profile-5.png" />
+                    src="<?= Asset::admin('assets/img/illustrations/profiles/profile-5.png') ?>" />
                     <div class="dropdown-notifications-item-content">
                         <div class="dropdown-notifications-item-content-text">Lorem ipsum dolor sit amet, consectetur
                             adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
@@ -168,25 +168,28 @@
             <a class="btn btn-icon btn-transparent-dark dropdown-toggle" id="navbarDropdownUserImage"
                 href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="false"><img class="img-fluid"
-                    src="assets/img/illustrations/profiles/profile-1.png" /></a>
+                    src="<?= Asset::admin('assets/img/illustrations/profiles/profile-1.png') ?>" /></a>
             <div class="dropdown-menu dropdown-menu-end border-0 shadow animated--fade-in-up"
                 aria-labelledby="navbarDropdownUserImage">
                 <h6 class="dropdown-header d-flex align-items-center">
-                    <img class="dropdown-user-img" src="assets/img/illustrations/profiles/profile-1.png" />
+                    <img class="dropdown-user-img" src="<?= Asset::admin('assets/img/illustrations/profiles/profile-1.png') ?>" />
                     <div class="dropdown-user-details">
                         <div class="dropdown-user-details-name">Valerie Luna<?= Html::escape("") ?></div>
                         <div class="dropdown-user-details-email">vluna@aol.com<?= Html::escape("") ?></div>
                     </div>
                 </h6>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="account-profile.html">
+                <a class="dropdown-item" href="profile.php">
                     <div class="dropdown-item-icon"><i data-feather="settings"></i></div>
                     Account
                 </a>
-                <a class="dropdown-item" href="<?= "src/auth/logout.php" ?>">
-                    <div class="dropdown-item-icon"><i data-feather="log-out"></i></div>
-                    Logout
-                </a>
+                <form method="post" action="<?= "../api/auth/logout.php" ?>" class="m-0">
+                    <input type="hidden" name="csrf_token" value="<?= CSRF::token(); ?>">
+                    <button type="submit" class="dropdown-item">
+                        <div class="dropdown-item-icon"><i data-feather="log-out"></i></div>
+                        Logout
+                    </button>
+                </form>
             </div>
         </li>
     </ul>

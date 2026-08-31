@@ -7,6 +7,7 @@ import WizardValidation from "../../forms/WizardValidation.js";
 import ProductImageGallery from "../../products/ProductImageGallery.js";
 import DiscountController from "../../products/DiscountController.js";
 import DynamicConstraints from "../../products/DynamicConstraints.js";
+import ProductFormSubmit from "../../products/ProductFormSubmit.js";
 
 const ELEMENTS = {
 
@@ -54,6 +55,12 @@ class AddProduct {
                 this.validation
             );
 
+        this.formSubmit =
+            new ProductFormSubmit(
+                this.dom.form,
+                "index.php"
+            );
+
     }
 
     initialize() {
@@ -69,6 +76,10 @@ class AddProduct {
         this.imageGallery.initialize();
 
         this.wizardValidation.initialize();
+
+        this.wizardValidation.onValidSubmit(
+            () => this.formSubmit.submit()
+        );
 
     }
 

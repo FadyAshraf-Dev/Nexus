@@ -34,7 +34,7 @@ require_once 'includes/head.php';
                                 <div class="card-body">
 
                                     <?= Flash::display()?>
-                                    <form role="form" id="loginForm" action="src/auth/check.php" method="post">
+                                    <form role="form" id="loginForm" action="../api/auth/login.php" method="post">
                                         <input type="hidden" name="csrf_token" value="<?= CSRF::token(); ?>">
 
                                         <div class="mb-3">
@@ -69,14 +69,10 @@ require_once 'includes/head.php';
                                         </div>
 
                                         <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
-                                            <a class="small" href="auth-password-basic.html">Forgot Password?</a>
+                                            <a class="small" href="../forgot-password.php">Forgot Password?</a>
                                             <button type="submit" class="btn btn-primary">Login</button>
                                         </div>
                                     </form>
-                                </div>
-                                <div class="card-footer text-center">
-                                    <div class="small"><a href="auth-register-basic.html">Need an account? Sign up!</a>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -90,6 +86,7 @@ require_once 'includes/head.php';
     </div>
 
     <?php require_once 'includes/scripts.php'; ?>
+    <script type="module" src="<?= Asset::admin('js/pages/auth/Login.js') ?>"></script>
 </body>
 
 </html>

@@ -1,230 +1,220 @@
 <?php
 declare(strict_types=1);
-// ini_set('display_errors', 1);
-// error_reporting(E_ALL);
 
 require_once dirname(__DIR__, 2) . '/bootstrap/bootstrap.php';
+
 Gatekeeper::authorize([
     Role::ADMIN,
-
-    Role::VENDOR
-
+    Role::VENDOR,
 ]);
 
 $userRole = Session::roleId();
+$isAdmin = $userRole === Role::ADMIN;
+
+$pdo = Database::connection();
+$user = (new UserRepository($pdo))->findById(Session::id());
 
 require 'includes/head.php';
 ?>
-    <body class="nav-fixed">
-        <?php require_once 'includes/navbar.php'; ?>
-        <div id="layoutSidenav">
-            <?php require_once 'includes/sidebar.php'; ?>
-            <div id="layoutSidenav_content">
-                <main>
-                    <header class="py-10 mb-4 bg-gradient-primary-to-secondary">
-                        <div class="container-xl px-4">
-                            <div class="text-center">
-                                <h1 class="text-white">Welcome to SB Admin Pro</h1>
-                                <p class="lead mb-0 text-white-50">A professionally designed admin panel template built with Bootstrap 5</p>
-                            </div>
-                        </div>
-                    </header>
-                    <!-- Main page content-->
-                    <div class="container-xl px-4">
-                        <h2 class="mt-5 mb-0">Dashboards</h2>
-                        <p>Three dashboard examples to get you started!</p>
-                        <hr class="mt-0 mb-4" />
-                        <div class="row">
-                            <div class="col-md-6 col-xl-4 mb-4 mb-xl-0">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="dashboard-1.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/dashboards/default.png" alt="..." /></a>
-                                <div class="text-center small">Default Dashboard</div>
-                            </div>
-                            <div class="col-md-6 col-xl-4 mb-4 mb-xl-0">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="dashboard-3.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/dashboards/affiliate.png" alt="..." /></a>
-                                <div class="text-center small">Affiliate Dashboard</div>
-                            </div>
-                            <div class="col-md-6 col-xl-4">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="dashboard-2.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/dashboards/multipurpose.png" alt="..." /></a>
-                                <div class="text-center small">Multipurpose Dashboard</div>
-                            </div>
-                        </div>
-                        <h2 class="mt-5 mb-0">App Pages</h2>
-                        <p>App pages to cover common use pages to help build your app!</p>
-                        <hr class="mt-0 mb-4" />
-                        <div class="row">
-                            <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="account-billing.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/pages/account-billing.png" alt="..." /></a>
-                                <div class="text-center small">Account - Billing</div>
-                            </div>
-                            <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="account-notifications.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/pages/account-notifications.png" alt="..." /></a>
-                                <div class="text-center small">Account - Notifications</div>
-                            </div>
-                            <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="account-profile.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/pages/account-profile.png" alt="..." /></a>
-                                <div class="text-center small">Account - Profile</div>
-                            </div>
-                            <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="account-security.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/pages/account-security.png" alt="..." /></a>
-                                <div class="text-center small">Account - Security</div>
-                            </div>
-                            <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="auth-login-basic.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/pages/auth-login-basic.png" alt="..." /></a>
-                                <div class="text-center small">Auth - Login</div>
-                            </div>
-                            <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="auth-login-social.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/pages/auth-login-social.png" alt="..." /></a>
-                                <div class="text-center small">Auth - Login (Social)</div>
-                            </div>
-                            <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="multi-tenant-select.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/pages/auth-mutli-tenant.png" alt="..." /></a>
-                                <div class="text-center small">Auth - Multi Tenant</div>
-                            </div>
-                            <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="auth-password-basic.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/pages/auth-password-basic.png" alt="..." /></a>
-                                <div class="text-center small">Auth - Password</div>
-                            </div>
-                            <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="auth-password-social.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/pages/auth-password-social.png" alt="..." /></a>
-                                <div class="text-center small">Auth - Password (Social)</div>
-                            </div>
-                            <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="auth-register-basic.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/pages/auth-register-basic.png" alt="..." /></a>
-                                <div class="text-center small">Auth - Register</div>
-                            </div>
-                            <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="auth-register-social.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/pages/auth-register-social.png" alt="..." /></a>
-                                <div class="text-center small">Auth - Register (Social)</div>
-                            </div>
-                            <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="invoice.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/pages/invoice.png" alt="..." /></a>
-                                <div class="text-center small">Invoice</div>
-                            </div>
-                            <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="knowledge-base-article.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/pages/knowledgebase-article.png" alt="..." /></a>
-                                <div class="text-center small">Knowledgebase - Article</div>
-                            </div>
-                            <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="knowledge-base-category.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/pages/knowledgebase-category.png" alt="..." /></a>
-                                <div class="text-center small">Knowledgebase - Category</div>
-                            </div>
-                            <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="knowledge-base-home-1.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/pages/knowledgebase-home-1.png" alt="..." /></a>
-                                <div class="text-center small">Knowledgebase - Home 1</div>
-                            </div>
-                            <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="knowledge-base-home-2.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/pages/knowledgebase-home-2.png" alt="..." /></a>
-                                <div class="text-center small">Knowledgebase - Home 2</div>
-                            </div>
-                            <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="pricing.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/pages/pricing.png" alt="..." /></a>
-                                <div class="text-center small">Pricing</div>
-                            </div>
-                            <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
-                                <a class="d-block lift rounded overflow-hidden mb-2" href="wizard.html"><img class="img-fluid" src="https://assets.startbootstrap.com/img/screenshots-product-pages/sb-admin-pro/pages/wizard.png" alt="..." /></a>
-                                <div class="text-center small">Wizard</div>
-                            </div>
-                        </div>
-                        <h2 class="mt-5 mb-0">Starter Layouts</h2>
-                        <p>Layouts for creating new pages within your project!</p>
-                        <hr class="mt-0 mb-4" />
-                        <div class="row">
-                            <div class="col-sm-6 col-md-4 mb-4">
-                                <div class="small mb-1">Navigation</div>
-                                <div class="list-group mb-4">
-                                    <a class="list-group-item list-group-item-action p-3" href="layout-static.html">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            Static Sidenav
-                                            <i class="text-muted" data-feather="arrow-right"></i>
-                                        </div>
-                                    </a>
-                                    <a class="list-group-item list-group-item-action p-3" href="layout-dark.html">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            Dark Sidenav
-                                            <i class="text-muted" data-feather="arrow-right"></i>
-                                        </div>
-                                    </a>
-                                    <a class="list-group-item list-group-item-action p-3" href="layout-rtl.html">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            RTL Layout
-                                            <i class="text-muted" data-feather="arrow-right"></i>
-                                        </div>
-                                    </a>
-                                </div>
-                                <div class="small mb-1">Container Options</div>
-                                <div class="list-group">
-                                    <a class="list-group-item list-group-item-action p-3" href="layout-boxed.html">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            Boxed Layouts
-                                            <i class="text-muted" data-feather="arrow-right"></i>
-                                        </div>
-                                    </a>
-                                    <a class="list-group-item list-group-item-action p-3" href="layout-fluid.html">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            Fluid Layout
-                                            <i class="text-muted" data-feather="arrow-right"></i>
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="col-sm-6 col-md-4 mb-4">
-                                <div class="small mb-1">Page Headers</div>
-                                <div class="list-group">
-                                    <a class="list-group-item list-group-item-action p-3" href="header-simplified.html">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            Simplified
-                                            <i class="text-muted" data-feather="arrow-right"></i>
-                                        </div>
-                                    </a>
-                                    <a class="list-group-item list-group-item-action p-3" href="header-compact.html">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            Compact
-                                            <i class="text-muted" data-feather="arrow-right"></i>
-                                        </div>
-                                    </a>
-                                    <a class="list-group-item list-group-item-action p-3" href="header-overlap.html">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            Content Overlap
-                                            <i class="text-muted" data-feather="arrow-right"></i>
-                                        </div>
-                                    </a>
-                                    <a class="list-group-item list-group-item-action p-3" href="header-breadcrumbs.html">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            Breadcrumbs
-                                            <i class="text-muted" data-feather="arrow-right"></i>
-                                        </div>
-                                    </a>
-                                    <a class="list-group-item list-group-item-action p-3" href="header-light.html">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            Light
-                                            <i class="text-muted" data-feather="arrow-right"></i>
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="col-sm-6 col-md-4 mb-4">
-                                <div class="small mb-1">Starter Layouts</div>
-                                <div class="list-group mb-4">
-                                    <a class="list-group-item list-group-item-action p-3" href="starter-default.html">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            Default
-                                            <i class="text-muted" data-feather="arrow-right"></i>
-                                        </div>
-                                    </a>
-                                    <a class="list-group-item list-group-item-action p-3" href="starter-minimal.html">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            Minimal
-                                            <i class="text-muted" data-feather="arrow-right"></i>
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </main>
-<?php require 'includes/footer.php'; ?>
-            </div>
-        </div>
-        <?php require 'includes/scripts.php'; ?>
-    </body>
+<body class="nav-fixed">
+	<?php require_once 'includes/navbar.php'; ?>
+	<div id="layoutSidenav">
+		<?php require_once 'includes/sidebar.php'; ?>
+		<div id="layoutSidenav_content">
+			<main>
+				<header class="page-header page-header-dark bg-gradient-primary-to-secondary pb-10">
+					<div class="container-xl px-4">
+						<div class="page-header-content pt-4">
+							<div class="row align-items-center justify-content-between">
+								<div class="col-auto mt-4">
+									<h1 class="page-header-title">
+										<div class="page-header-icon"><i data-feather="home"></i></div>
+										Welcome back<?= $user ? ', ' . htmlspecialchars($user['username'], ENT_QUOTES) : '' ?>
+									</h1>
+									<div class="page-header-subtitle">
+										<?= $isAdmin
+											? "Here's everything you can manage as an admin."
+											: "Here's everything you can manage as a vendor." ?>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</header>
+
+				<div class="container-xl px-4 mt-n10">
+
+					<?php if ($isAdmin): ?>
+
+						<div class="card mb-4">
+							<div class="card-body">
+								<h2 class="h4 mb-1">Marketplace</h2>
+								<p class="text-muted mb-0">Manage the products, categories, and orders customers see.</p>
+							</div>
+						</div>
+						<div class="row">
+
+							<div class="col-md-6 col-xl-4 mb-4">
+								<a href="product_management.php" class="card lift h-100 text-decoration-none">
+									<div class="card-body d-flex align-items-start">
+										<i data-feather="shopping-bag" class="text-primary me-3"></i>
+										<div>
+											<div class="fw-bold">Product Management</div>
+											<div class="text-muted small">Review and edit every vendor's listings.</div>
+										</div>
+									</div>
+								</a>
+							</div>
+
+							<div class="col-md-6 col-xl-4 mb-4">
+								<a href="category_management.php" class="card lift h-100 text-decoration-none">
+									<div class="card-body d-flex align-items-start">
+										<i data-feather="layers" class="text-primary me-3"></i>
+										<div>
+											<div class="fw-bold">Category Management</div>
+											<div class="text-muted small">Organize how products are grouped and browsed.</div>
+										</div>
+									</div>
+								</a>
+							</div>
+
+							<div class="col-md-6 col-xl-4 mb-4">
+								<a href="coupon_management.php" class="card lift h-100 text-decoration-none">
+									<div class="card-body d-flex align-items-start">
+										<i data-feather="tag" class="text-primary me-3"></i>
+										<div>
+											<div class="fw-bold">Coupon Management</div>
+											<div class="text-muted small">Create and manage storewide discounts.</div>
+										</div>
+									</div>
+								</a>
+							</div>
+
+							<div class="col-md-6 col-xl-4 mb-4">
+								<a href="order_management.php" class="card lift h-100 text-decoration-none">
+									<div class="card-body d-flex align-items-start">
+										<i data-feather="shopping-cart" class="text-primary me-3"></i>
+										<div>
+											<div class="fw-bold">Order Management</div>
+											<div class="text-muted small">Track and manage every order placed storewide.</div>
+										</div>
+									</div>
+								</a>
+							</div>
+
+							<div class="col-md-6 col-xl-4 mb-4">
+								<a href="review_management.php" class="card lift h-100 text-decoration-none">
+									<div class="card-body d-flex align-items-start">
+										<i data-feather="message-square" class="text-primary me-3"></i>
+										<div>
+											<div class="fw-bold">Review Management</div>
+											<div class="text-muted small">Moderate customer reviews left on products.</div>
+										</div>
+									</div>
+								</a>
+							</div>
+
+						</div>
+
+						<h2 class="mt-4 mb-0">People</h2>
+						<p>Manage accounts and who's allowed to sell.</p>
+						<hr class="mt-0 mb-4" />
+						<div class="row">
+
+							<div class="col-md-6 col-xl-4 mb-4">
+								<a href="user_management.php" class="card lift h-100 text-decoration-none">
+									<div class="card-body d-flex align-items-start">
+										<i data-feather="users" class="text-primary me-3"></i>
+										<div>
+											<div class="fw-bold">User Management</div>
+											<div class="text-muted small">Browse and manage every registered account.</div>
+										</div>
+									</div>
+								</a>
+							</div>
+
+							<div class="col-md-6 col-xl-4 mb-4">
+								<a href="vendor_requests.php" class="card lift h-100 text-decoration-none">
+									<div class="card-body d-flex align-items-start">
+										<i data-feather="user-check" class="text-primary me-3"></i>
+										<div>
+											<div class="fw-bold">Vendor Requests</div>
+											<div class="text-muted small">Review and approve applications to become a vendor.</div>
+										</div>
+									</div>
+								</a>
+							</div>
+
+							<div class="col-md-6 col-xl-4 mb-4">
+								<a href="profile.php" class="card lift h-100 text-decoration-none">
+									<div class="card-body d-flex align-items-start">
+										<i data-feather="settings" class="text-primary me-3"></i>
+										<div>
+											<div class="fw-bold">My Profile</div>
+											<div class="text-muted small">Update your own account info and password.</div>
+										</div>
+									</div>
+								</a>
+							</div>
+
+						</div>
+
+					<?php else: ?>
+
+						<div class="card mb-4">
+							<div class="card-body">
+								<h2 class="h4 mb-1">Your Store</h2>
+								<p class="text-muted mb-0">Manage the products you sell on Nexus.</p>
+							</div>
+						</div>
+						<div class="row">
+
+							<div class="col-md-6 col-xl-4 mb-4">
+								<a href="my_products.php" class="card lift h-100 text-decoration-none">
+									<div class="card-body d-flex align-items-start">
+										<i data-feather="box" class="text-primary me-3"></i>
+										<div>
+											<div class="fw-bold">My Products</div>
+											<div class="text-muted small">View, edit, and manage your product listings.</div>
+										</div>
+									</div>
+								</a>
+							</div>
+
+							<div class="col-md-6 col-xl-4 mb-4">
+								<a href="add_product.php" class="card lift h-100 text-decoration-none">
+									<div class="card-body d-flex align-items-start">
+										<i data-feather="plus-circle" class="text-primary me-3"></i>
+										<div>
+											<div class="fw-bold">Add a Product</div>
+											<div class="text-muted small">List a new item for sale.</div>
+										</div>
+									</div>
+								</a>
+							</div>
+
+							<div class="col-md-6 col-xl-4 mb-4">
+								<a href="profile.php" class="card lift h-100 text-decoration-none">
+									<div class="card-body d-flex align-items-start">
+										<i data-feather="settings" class="text-primary me-3"></i>
+										<div>
+											<div class="fw-bold">My Profile</div>
+											<div class="text-muted small">Update your own account info and password.</div>
+										</div>
+									</div>
+								</a>
+							</div>
+
+						</div>
+
+					<?php endif; ?>
+
+				</div>
+			</main>
+			<?php require 'includes/footer.php'; ?>
+		</div>
+	</div>
+	<?php require 'includes/scripts.php'; ?>
+</body>
+
 </html>

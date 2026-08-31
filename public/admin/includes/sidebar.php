@@ -14,6 +14,10 @@
                                     <div class="nav-link-icon"><i data-feather="users"></i></div>
                                     User Management
                                 </a>
+                                <a class="nav-link<?= Navigation::activeIf('vendor_requests.php') ?>" href="vendor_requests.php">
+                                    <div class="nav-link-icon"><i data-feather="user-check"></i></div>
+                                    Vendor Requests
+                                </a>
                                 <a class="nav-link<?= Navigation::activeIf('category_management.php') ?>" href="category_management.php">
                                     <div class="nav-link-icon"><i data-feather="layers"></i></div>
                                     Category Management
@@ -40,7 +44,7 @@
                             <?php if (isset($userRole) && (int)$userRole === 2): ?>
                                 <div class="sidenav-menu-heading">Vendor Dashboard</div>
                                 
-                                <a class="nav-link<?= Navigation::activeIf('index.php') ?>" href="vendor_home.php">
+                                <a class="nav-link<?= Navigation::activeIf('index.php') ?>" href="index.php">
                                     <div class="nav-link-icon"><i data-feather="home"></i></div>
                                     Home
                                 </a>

@@ -155,7 +155,7 @@ class MyProducts {
 
       switch (button.dataset.action) {
         case "edit":
-          location.href = `/admin/products/edit-product.php?id=${id}`;
+          location.href = `/admin/edit_product.php?id=${id}`;
 
           break;
 

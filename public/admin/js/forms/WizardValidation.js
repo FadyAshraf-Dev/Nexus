@@ -133,6 +133,20 @@ export default class WizardValidation {
 
     }
 
+    /**
+     * Registers a callback to run in place of the native form
+     * submit once every step passes validation. Used by
+     * AddProduct.js/EditProduct.js to submit via fetch (JSON
+     * response, no page reload) instead of a native POST -
+     * without this, handleSubmit() below falls through to the
+     * browser's default multipart form submission.
+     */
+    onValidSubmit(callback) {
+
+        this.validSubmitCallback = callback;
+
+    }
+
     handleSubmit(event) {
 
         this.formValidation.start();
@@ -141,6 +155,16 @@ export default class WizardValidation {
         if (!this.formValidation.validateForm()) {
 
             event.preventDefault();
+
+            return;
+
+        }
+
+        if (this.validSubmitCallback) {
+
+            event.preventDefault();
+
+            this.validSubmitCallback();
 
         }
 

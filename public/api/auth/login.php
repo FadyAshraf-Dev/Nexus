@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__, 3) . '/bootstrap/bootstrap.php';
 
-Gatekeeper::guestOnly();
+// Gatekeeper::guestOnly();
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+// if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
-    Response::json([
-        'success' => false,
-        'message' => 'Method Not Allowed.',
-    ], 405);
+//     Response::json([
+//         'success' => false,
+//         'message' => 'Method Not Allowed.',
+//     ], 405);
 
-}
+// }
 
 CSRF::verify();
 

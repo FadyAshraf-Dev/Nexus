@@ -111,6 +111,11 @@ class ProductManagement {
       const id = Number(button.dataset.id);
 
       switch (button.dataset.action) {
+        case "edit":
+          window.location.href = `edit_product.php?id=${id}`;
+
+          break;
+
         case "delete":
           await this.deleteProduct(id);
 

@@ -55,7 +55,9 @@ if (isset($_SESSION["user"])) {
             </p>
           </div>
 
-          <form action="#" method="post" class="login__form">
+          <div id="login-feedback"></div>
+
+          <form id="login-form" action="api/auth/login.php" method="post" class="login__form">
             <div class="login__group">
               <label for="email"> Email Address </label>
 
@@ -89,7 +91,7 @@ if (isset($_SESSION["user"])) {
                 Remember me
               </label>
 
-              <a href="#"> Forgot password? </a>
+              <a href="forgot-password.php"> Forgot password? </a>
             </div>
 
             <button type="submit" class="site-btn login__button">
@@ -104,7 +106,7 @@ if (isset($_SESSION["user"])) {
           <div class="login__footer">
             <p>Don't have an account?</p>
 
-            <a href="register.html"> Create one </a>
+            <a href="register.php"> Create one </a>
           </div>
         </div>
 
@@ -128,6 +130,7 @@ if (isset($_SESSION["user"])) {
 
   <!-- Js Plugins -->
   <?php include 'includes/scripts.php'; ?>
+  <script type="module" src="/admin/js/pages/storefront-login/Login.js"></script>
 
 </body>
 

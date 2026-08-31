@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once dirname(__DIR__, 2) . '/bootstrap/bootstrap.php';
-Gatekeeper::authorize([Role::VENDOR]);
+Gatekeeper::authorize([Role::VENDOR, Role::ADMIN]);
 $errors = Errors::all();
 $old = Old::all();
 Errors::clear();
@@ -106,7 +106,7 @@ $categories = $categoryRepository->findAll();
                         </div>
                         <div class="card-body">
                            <!-- Single form wraps the whole wizard so one submit posts every step's fields together-->
-                           <form id="addProductForm" action="src/actions/products/insert.php" method="POST"
+                           <form id="addProductForm" action="api/product/create.php" method="POST"
                               enctype="multipart/form-data" novalidate>
                               <input type="hidden" name="csrf_token" value="<?= CSRF::token(); ?>">
                               <div class="tab-content" id="productWizardTabContent">
@@ -414,9 +414,6 @@ $categories = $categoryRepository->findAll();
    <?php require 'includes/scripts.php'; ?>
 
    <script type="module" src="<?= Asset::admin('js/pages/products/AddProduct.js') ?>"></script>
-   <script>
-
-   </script>
 
 </body>
 

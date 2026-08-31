@@ -1743,6 +1743,19 @@ ol {
   height: 100%;
   text-align: center;
   border: none;
+
+  /* Suppress the native number-input spinner - the theme
+     provides its own up/down arrows (.qtybtn) instead, so the
+     browser's default ones would show up as a duplicate,
+     conflicting control on hover. */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.product__details__cart__option .quantity .pro-qty input::-webkit-outer-spin-button,
+.product__details__cart__option .quantity .pro-qty input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .product__details__cart__option .quantity .pro-qty .qtybtn {
@@ -1757,7 +1770,7 @@ ol {
   font-weight: 600;
 }
 
-.product__details__cart__option .quantity .pro-qty .qtybtn.inc {
+.product__details__cart__option .quantity .pro-qty .qtybtn.dec {
   top: 16px;
 }
 
@@ -2388,6 +2401,29 @@ ol {
   text-align: center;
   color: #111111;
   font-size: 16px;
+
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.shopping__cart__table
+  table
+  tbody
+  tr
+  td.quantity__item
+  .quantity
+  .pro-qty-2
+  input::-webkit-outer-spin-button,
+.shopping__cart__table
+  table
+  tbody
+  tr
+  td.quantity__item
+  .quantity
+  .pro-qty-2
+  input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .shopping__cart__table
@@ -4013,6 +4049,14 @@ ol {
 
 .login__group {
   margin-bottom: 22px;
+}
+
+.login__field-error {
+  color: #c0392b;
+
+  font-size: 13px;
+
+  margin-top: 6px;
 }
 
 .login__group label {
@@ -5941,4 +5985,265 @@ ol {
 
     text-decoration: underline;
 
+}
+
+.profile__card-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    font-size: 18px;
+
+    font-weight: 600;
+
+    color: #111111;
+
+    margin-bottom: 20px;
+
+}
+
+.profile__card-title i {
+
+    color: #7cb5b2;
+
+}
+
+.profile__notice {
+
+    background: #fdf2f2;
+
+    border: 1px solid #f5c6cb;
+
+    color: #c0392b;
+
+    font-size: 13px;
+
+    padding: 10px 14px;
+
+    border-radius: 3px;
+
+    margin-bottom: 18px;
+
+}
+
+.profile__feedback:not(:empty) {
+
+    font-size: 14px;
+
+    margin-bottom: 14px;
+
+}
+
+.login__input--textarea {
+    height: auto;
+}
+
+.login__input--textarea span {
+    top: 22px;
+    transform: none;
+}
+
+.login__input textarea {
+    width: 100%;
+
+    min-height: 130px;
+
+    border: 1px solid #e5e5e5;
+
+    padding: 15px 55px 15px 20px;
+
+    font-size: 15px;
+
+    color: #111111;
+
+    transition: 0.3s;
+
+    border-radius: 8px;
+
+    resize: vertical;
+}
+
+.login__input textarea:focus {
+    border-color: #111111;
+
+    box-shadow: none;
+
+    outline: none;
+}
+
+.header__notifications {
+    position: relative;
+}
+
+.header__notifications-toggle {
+    background: none;
+
+    border: none;
+
+    padding: 0;
+
+    cursor: pointer;
+
+    position: relative;
+
+    color: #111111;
+
+    font-size: 20px;
+
+    display: flex;
+
+    align-items: center;
+}
+
+.header__notifications-badge {
+    position: absolute;
+
+    top: -6px;
+
+    right: -10px;
+
+    background: #e74c3c;
+
+    color: #ffffff;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    line-height: 1;
+
+    padding: 3px 5px;
+
+    border-radius: 10px;
+
+    min-width: 16px;
+
+    text-align: center;
+}
+
+.header__notifications-dropdown {
+    display: none;
+
+    position: absolute;
+
+    top: calc(100% + 18px);
+
+    right: 0;
+
+    width: 320px;
+
+    max-height: 400px;
+
+    overflow-y: auto;
+
+    background: #ffffff;
+
+    border: 1px solid #ececec;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+
+    border-radius: 6px;
+
+    z-index: 100;
+}
+
+.header__notifications-dropdown.is-open {
+    display: block;
+}
+
+.header__notifications-header {
+    padding: 14px 18px;
+
+    font-weight: 600;
+
+    border-bottom: 1px solid #ececec;
+}
+
+.header__notifications-empty {
+    padding: 30px 18px;
+
+    text-align: center;
+
+    color: #999999;
+
+    font-size: 14px;
+}
+
+.header__notifications-item {
+    display: block;
+
+    padding: 12px 18px;
+
+    border-bottom: 1px solid #f5f5f5;
+
+    text-decoration: none;
+
+    color: #111111;
+}
+
+.header__notifications-item:last-child {
+    border-bottom: none;
+}
+
+.header__notifications-item:hover {
+    background: #fafafa;
+}
+
+.header__notifications-item.is-unread {
+    background: #f6fbfa;
+
+    font-weight: 600;
+}
+
+.header__notifications-item-text {
+    font-size: 14px;
+
+    margin-bottom: 4px;
+}
+
+.header__notifications-item-time {
+    font-size: 12px;
+
+    color: #999999;
+}
+
+.profile__signout {
+    margin-top: 18px;
+
+    padding-top: 18px;
+
+    border-top: 1px solid #f0f0f0;
+}
+
+.profile__signout-btn {
+    width: 100%;
+
+    background: none;
+
+    border: 1px solid #e5e5e5;
+
+    color: #999999;
+
+    padding: 12px 30px;
+
+    font-size: 13px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+
+    border-radius: 8px;
+}
+
+.profile__signout-btn:hover {
+    border-color: #c0392b;
+
+    color: #c0392b;
 }

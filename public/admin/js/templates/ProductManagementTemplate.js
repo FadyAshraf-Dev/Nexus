@@ -38,8 +38,18 @@ export default class ProductManagementTemplate extends Template {
   }
 
   actions(product) {
+    const isOwner = product.vendor_id === this.currentUserId();
+
     return `
             <div class="d-inline-flex">
+
+                ${isOwner ? this.button({
+                  icon: "edit",
+                  action: "edit",
+                  id: product.id,
+                  title: "Edit",
+                  className: "btn-datatable btn-icon btn-transparent-dark me-2",
+                }) : ""}
 
                 ${this.button({
                   icon: "trash-2",
@@ -51,6 +61,15 @@ export default class ProductManagementTemplate extends Template {
 
             </div>
         `;
+  }
+
+  // Editing is owner-only server-side (see admin/api/product/update.php);
+  // this only hides the button for non-owners so it's not a dead
+  // click - the real enforcement is the 403 on the backend.
+  currentUserId() {
+    const meta = document.querySelector('meta[name="current-user-id"]');
+
+    return meta ? Number(meta.content) : null;
   }
 
   price(product) {
