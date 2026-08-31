@@ -6,6 +6,17 @@ require_once dirname(__DIR__, 3) . '/bootstrap/bootstrap.php';
 
 Gatekeeper::authorize([1,2,3]);
 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+
+    Response::json([
+        'success' => false,
+        'message' => 'Method Not Allowed.',
+    ], 405);
+
+}
+
+CSRF::verify();
+
 try {
 
     $validator =
@@ -62,13 +73,13 @@ try {
 
 } catch (Throwable $exception) {
 
-    error_log($exception->getMessage());
+    error_log((string) $exception);
 
     Response::json([
 
         "success" => false,
 
-        "message" => $exception->getMessage(),
+        "message" => "An unexpected error occurred.",
     ], 500);
 
 }
