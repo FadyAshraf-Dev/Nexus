@@ -29,16 +29,18 @@ export default class Ajax {
 
     const hasBody = data !== null;
 
+    const isFormData = data instanceof FormData;
+
     const options = {
       method,
 
-      headers: this.buildHeaders(hasBody),
+      headers: this.buildHeaders(hasBody, isFormData),
 
       signal: controller.signal,
     };
 
     if (hasBody) {
-      options.body = JSON.stringify(data);
+      options.body = isFormData ? data : JSON.stringify(data);
     }
 
     try {
@@ -57,7 +59,7 @@ export default class Ajax {
       throw error;
     }
   }
-  static buildHeaders(hasBody = false) {
+  static buildHeaders(hasBody = false, isFormData = false) {
     const headers = {
       Accept: "application/json",
 
@@ -66,7 +68,10 @@ export default class Ajax {
       "X-CSRF-TOKEN": this.getCsrfToken(),
     };
 
-    if (hasBody) {
+    // Content-Type is deliberately omitted for FormData bodies: the
+    // browser sets it itself, including the multipart boundary, and
+    // setting it manually here would break the upload.
+    if (hasBody && !isFormData) {
       headers["Content-Type"] = "application/json";
     }
 
@@ -98,7 +103,16 @@ export default class Ajax {
       throw new Error("Server did not return valid JSON.");
     }
     if (!response.ok) {
-      throw new Error(payload.message ?? "Request failed.");
+      const error = new Error(payload.message ?? "Request failed.");
+
+      // Non-2xx responses can still carry a useful payload beyond
+      // .message - e.g. { errors: { field: "..." } } from validation
+      // failures. Attach it so callers that need it can read
+      // error.payload; callers that only read error.message are
+      // unaffected.
+      error.payload = payload;
+
+      throw error;
     }
 
     return payload;
