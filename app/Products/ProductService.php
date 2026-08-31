@@ -23,8 +23,8 @@ class ProductService
         array $productData,
         array $files
     ): int {
+        $this->pdo->beginTransaction();
         try {
-            $this->pdo->beginTransaction();
             $slug = $this->generateUniqueSlug($productData["vendor_id"], $productData["product_name"]);
             $productData["slug"] = $slug;
 
@@ -60,9 +60,9 @@ class ProductService
             throw new InvalidArgumentException($message);
         }
 
-        try {
+        $this->pdo->beginTransaction();
 
-            $this->pdo->beginTransaction();
+        try {
 
             $existingProduct = $this->productRepository->findById($productId);
 
@@ -108,9 +108,9 @@ class ProductService
     }
     public function deleteProduct(int $productId): void
     {
-        try {
+        $this->pdo->beginTransaction();
 
-            $this->pdo->beginTransaction();
+        try {
 
             $product = $this->productRepository->findById($productId);
 
