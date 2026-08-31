@@ -13,6 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     ], 405);
 }
 
+CSRF::verify();
+
 try {
 
     // NOTE: filter_input(INPUT_POST, ...) reads PHP's raw request-parse

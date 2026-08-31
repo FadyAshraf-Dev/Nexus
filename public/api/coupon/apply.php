@@ -14,6 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     ], 405);
 }
 
+CSRF::verify();
+
 try {
 
     $validator = CouponValidator::validateApply($_POST);
@@ -55,6 +57,6 @@ try {
 
     Response::json([
         'success' => false,
-        'message' => $exception->getMessage(),
+        'message' => 'An unexpected error occurred.',
     ], 500);
 }

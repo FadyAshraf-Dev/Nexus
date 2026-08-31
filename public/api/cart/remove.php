@@ -11,6 +11,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     ], 405);
 
 }
+
+CSRF::verify();
+
 try {
 
     $validator = CartValidator::validateRemove($_POST);
@@ -50,11 +53,13 @@ try {
 
 } catch (Throwable $e) {
 
+    error_log((string) $e);
+
     Response::json([
 
         'success' => false,
 
-        'message' => $e->getMessage(),
+        'message' => 'An unexpected error occurred.',
 
     ], 500);
 

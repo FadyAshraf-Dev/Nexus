@@ -17,6 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 }
 
+CSRF::verify();
+
 try {
 
     // See public/api/review/update.php for why $_POST is read directly

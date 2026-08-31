@@ -13,6 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     ], 405);
 }
 
+CSRF::verify();
+
 try {
 
     // See update.php for why filter_input(INPUT_POST) doesn't work here.
@@ -47,6 +49,13 @@ try {
         'success' => true,
         'message' => 'Review deleted.',
     ]);
+
+} catch (RuntimeException $exception) {
+
+    Response::json([
+        'success' => false,
+        'message' => $exception->getMessage(),
+    ], 400);
 
 } catch (Throwable $exception) {
 

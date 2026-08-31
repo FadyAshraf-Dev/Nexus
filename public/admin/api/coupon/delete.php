@@ -17,6 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 }
 
+CSRF::verify();
+
 try {
 
     $couponId = filter_var(

@@ -13,6 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     ], 405);
 }
 
+CSRF::verify();
+
 try {
 
     $service = new NotificationService(Database::connection());

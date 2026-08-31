@@ -16,6 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 }
 
+CSRF::verify();
+
 try {
 
     $reviewId = filter_var(
