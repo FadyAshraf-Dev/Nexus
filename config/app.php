@@ -42,4 +42,10 @@ return [
         'admin_url' => '/admin/',
         'product_uploads' => '/uploads/products/',
     ],
+
+    'mail' => [
+        'from_address' => 'no-reply@nexus.test',
+        'from_name' => 'Nexus',
+    ],
+
 ];
