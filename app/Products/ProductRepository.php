@@ -316,6 +316,7 @@ final class ProductRepository extends Repository
         $sql = "
     SELECT
         p.id,
+        p.vendor_id,
         p.product_name,
         p.slug,
         p.brand,
