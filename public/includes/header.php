@@ -31,13 +31,50 @@
 
       <div class="header__actions">
 
-        <a href="/login.php">
+        <?php if (Session::check()): ?>
 
-          <span>Hello, Sign in</span>
+          <?php if (Session::roleId() === Role::CUSTOMER): ?>
+            <a href="/become-vendor.php">
+              <span>Want to sell?</span>
+              <strong>Become a Vendor</strong>
+            </a>
+          <?php endif; ?>
 
-          <strong>Account</strong>
+          <div class="header__notifications">
+            <button type="button" id="notification-bell-toggle" class="header__notifications-toggle">
+              <span class="icon_comment_alt"></span>
+              <span id="notification-badge" class="header__notifications-badge" hidden></span>
+            </button>
 
-        </a>
+            <div id="notification-dropdown" class="header__notifications-dropdown">
+              <div class="header__notifications-header">Notifications</div>
+              <div id="notification-list">
+                <div class="header__notifications-empty" id="notification-empty">
+                  No notifications yet.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <a href="/profile.php">
+
+            <span>Hello, <?= htmlspecialchars(Session::user()['email'], ENT_QUOTES) ?></span>
+
+            <strong>My Profile</strong>
+
+          </a>
+
+        <?php else: ?>
+
+          <a href="/login.php">
+
+            <span>Hello, Sign in</span>
+
+            <strong>Account</strong>
+
+          </a>
+
+        <?php endif; ?>
 
         <a href="/my-orders.php">
 
