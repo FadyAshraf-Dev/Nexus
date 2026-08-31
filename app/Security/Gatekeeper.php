@@ -30,4 +30,29 @@ class Gatekeeper {
         }
     }
 
+    /**
+     * Rejects the request with a JSON 409 if the caller already
+     * has an active session. For guest-only JSON endpoints
+     * (register, login, activate) where authorize() doesn't fit -
+     * authorize() always *requires* a session and redirects to an
+     * HTML page on failure, the opposite of what these need.
+     *
+     * Named guestOnly() rather than "unauthorized" - 401 has a
+     * specific, different meaning (missing/invalid credentials).
+     * This is the reverse case: too authenticated, not too little.
+     */
+    public static function guestOnly(): void
+    {
+        Session::start();
+
+        if (!Session::guest()) {
+
+            Response::json([
+                'success' => false,
+                'message' => 'You are already logged in.',
+            ], 409);
+
+        }
+    }
+
 }

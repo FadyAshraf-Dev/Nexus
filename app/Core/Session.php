@@ -86,6 +86,25 @@ class Session
 
     }
 
+    /**
+     * Overwrites the session's cached role_id from a freshly
+     * queried value, without touching id/email or forcing a full
+     * re-login. Needed because login() only ever writes role_id
+     * once, at sign-in - a role change made mid-session (e.g. a
+     * vendor-request approval) would otherwise stay invisible to
+     * Gatekeeper::authorize() until the user logs out and back in.
+     */
+    public static function refreshRole(int $roleId): void
+    {
+        self::start();
+
+        if (!self::check()) {
+            return;
+        }
+
+        $_SESSION['user']['role_id'] = $roleId;
+    }
+
     public static function guest(): bool
     {
         return !self::check();
