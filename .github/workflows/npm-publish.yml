@@ -1,0 +1,47 @@
+name: Publish nexus-toolkit to npm
+
+on:
+  push:
+    tags:
+      - "toolkit-v*.*.*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/nexus-toolkit
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        # No package-lock.json is committed for this zero-dependency
+        # package, so npm ci (which requires one) can't be used here.
+        # npm install works without a lockfile; since this package has
+        # no dependencies at all, the strictness npm ci buys elsewhere
+        # doesn't apply.
+        run: npm install
+
+      - name: Verify tag matches package.json version
+        run: |
+          PKG_VERSION="v$(node -p "require('./package.json').version")"
+          TAG_VERSION="${GITHUB_REF_NAME#toolkit-}"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "Tag ($TAG_VERSION) does not match package.json version ($PKG_VERSION)"
+            exit 1
+          fi
+
+      - name: Publish
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

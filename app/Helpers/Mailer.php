@@ -1,50 +1,45 @@
 <?php
+
 declare(strict_types=1);
-class Mailer{
-    /**
-     * Sends a plain-text email via PHP's built-in mail().
-     *
-     * No SMTP library exists in this project (no Composer/vendor
-     * dependencies at all), so this wraps mail() directly. On
-     * XAMPP, mail() requires a local SMTP relay configured in
-     * php.ini ([mail function] section) to actually deliver -
-     * without that, this will return false or silently no-op
-     * depending on your php.ini setup.
-     */
+
+use FadyAshrafDev\NexusSupport\Mailer as MailerCore;
+
+/**
+ * Static facade over FadyAshrafDev\NexusSupport\Mailer.
+ *
+ * Every existing call site (Mailer::send(...), Mailer::absoluteUrl(...))
+ * is untouched by this refactor. The actual mail() wrapping now
+ * lives in the instantiable, dependency-free NexusSupport\Mailer
+ * class, constructed here with the same from-address/from-name/
+ * base-url (via Config) it always used.
+ */
+final class Mailer
+{
+    private static ?MailerCore $instance = null;
+
     public static function send(
         string $to,
         string $subject,
         string $body
     ): bool {
-
-        $fromAddress = Config::app('mail.from_address');
-        $fromName = Config::app('mail.from_name');
-
-        $headers = "From: {$fromName} <{$fromAddress}>\r\n";
-        $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
-
-        return mail($to, $subject, $body, $headers);
+        return self::instance()->send($to, $subject, $body);
     }
 
-    /**
-     * Builds an absolute URL back to this app, e.g.
-     * "http://nexus.test/activate.php?..." - config's
-     * urls.base_url is just "/" (no domain), so the host is
-     * read from the current request instead of hardcoded,
-     * meaning this works whether you're on nexus.test or
-     * localhost without editing config.
-     */
     public static function absoluteUrl(string $path): string
     {
-        $scheme = (
-            !empty($_SERVER['HTTPS'])
-            && $_SERVER['HTTPS'] !== 'off'
-        ) ? 'https' : 'http';
+        return self::instance()->absoluteUrl($path);
+    }
 
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    private static function instance(): MailerCore
+    {
+        if (self::$instance === null) {
+            self::$instance = new MailerCore(
+                Config::app('mail.from_address'),
+                Config::app('mail.from_name'),
+                Config::app('urls.base_url')
+            );
+        }
 
-        $base = rtrim(Config::app('urls.base_url'), '/');
-
-        return "{$scheme}://{$host}{$base}/" . ltrim($path, '/');
+        return self::$instance;
     }
 }

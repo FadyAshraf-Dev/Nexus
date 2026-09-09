@@ -2,6 +2,14 @@
 
 declare(strict_types=1);
 
+// Composer-managed packages (currently just fadyashraf-dev/nexus-support,
+// which app/Helpers/Config.php and app/Core/Database.php delegate to).
+// Composer itself is only needed for this - the rest of the app still
+// uses the flat-directory autoloader below, unchanged.
+if (is_file(ROOT_PATH . '/vendor/autoload.php')) {
+    require_once ROOT_PATH . '/vendor/autoload.php';
+}
+
 spl_autoload_register(function (string $class): void {
 
     $directories = [

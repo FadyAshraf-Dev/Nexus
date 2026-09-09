@@ -1,0 +1,59 @@
+name: Publish nexus-support (subtree split + Packagist notify)
+
+on:
+  push:
+    tags:
+      - "support-v*.*.*"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/nexus-support
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+
+      - name: Validate composer.json
+        run: composer validate --strict
+
+      - name: Install dependencies (sanity check autoload)
+        run: composer install --no-progress --prefer-dist
+
+  split-and-notify:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history, needed for subtree split)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Packagist reads composer.json from a repo's ROOT, and this
+      # package lives at packages/nexus-support/ inside the Nexus
+      # monorepo, not at root. So we split that subfolder's history
+      # into its own standalone repo (FadyAshraf-Dev/Nexus-Support)
+      # on every tag push, and THAT repo is what's registered with
+      # Packagist - not this monorepo.
+      - name: Split packages/nexus-support into standalone repo
+        uses: frankdejonge/use-subsplit-publish@1.2.0
+        with:
+          source-branch: "refs/tags/${{ github.ref_name }}"
+          target-branch: "main"
+          target-repository: "github.com/FadyAshraf-Dev/Nexus-Support.git"
+          target-token: "${{ secrets.SUBSPLIT_TOKEN }}"
+          source-directory: "packages/nexus-support"
+          target-tag: "${{ github.ref_name }}"
+
+      - name: Notify Packagist
+        run: |
+          curl -sSf -X POST \
+            "https://packagist.org/api/update-package?username=${{ secrets.PACKAGIST_USERNAME }}&apiToken=${{ secrets.PACKAGIST_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"repository":{"url":"https://github.com/FadyAshraf-Dev/Nexus-Support"}}'

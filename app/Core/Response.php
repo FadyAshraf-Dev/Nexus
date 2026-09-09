@@ -1,64 +1,55 @@
 <?php
+
 declare(strict_types=1);
-class Response
+
+use FadyAshrafDev\NexusSupport\Response as ResponseCore;
+
+/**
+ * Static facade over FadyAshrafDev\NexusSupport\Response.
+ *
+ * Every existing call site (Response::redirectAdmin(), redirectBase(),
+ * forbidden(), json()) is untouched by this refactor - this class
+ * still exposes exactly the same static API. The actual logic now
+ * lives in the instantiable, dependency-free NexusSupport\Response
+ * class, constructed here with the same admin/base URLs (read via
+ * the existing Config facade) and the same 403 template path
+ * (__DIR__-relative, exactly as the original resolved it) it always
+ * used.
+ */
+final class Response
 {
-    /**
-     * Structural application response client router redirect controller wrapper
-     */
-    private static function redirect($url)
-    {
-        header("Location: " . $url);
-        exit();
-    }
+    private static ?ResponseCore $instance = null;
+
     public static function redirectAdmin($url)
     {
-        self::redirect(
-            Config::app('urls.admin_url') . $url
-        );
+        self::instance()->redirectAdmin($url);
     }
+
     public static function redirectBase($url)
     {
-        self::redirect(
-            Config::app('urls.base_url') . $url
-        );
+        self::instance()->redirectBase($url);
     }
-    /**
-     * Centralized Error Handler: Shuts down execution and renders the 403 Forbidden UI.
-     */
+
     public static function forbidden()
     {
-        // 1. Tell the browser/attacker explicitly this is a 403 Forbidden request
-        http_response_code(403);
-
-        // 2. Resolve the path: __DIR__ is the classes/ folder. 
-        // We step out of classes/ and step into the admin/ folder to find the template.
-        $customErrorPage = __DIR__ . '/../admin/error-403.html';
-
-        if (file_exists($customErrorPage)) {
-            require_once $customErrorPage;
-        } else {
-            // Safe fallback layout if the file is ever missing or accidentally renamed
-            echo "<h1>403 Forbidden</h1>";
-            echo "<p>Your client does not have permission to get this page from the server.</p>";
-        }
-        // 3. Hard-kill execution to stop any remaining script logic or leaks
-        exit();
+        self::instance()->forbidden();
     }
-    public static function json(
-        mixed $data,
-        int $status = 200
-    ): never {
 
-        http_response_code($status);
+    public static function json(mixed $data, int $status = 200): never
+    {
+        self::instance()->json($data, $status);
+    }
 
-        header('Content-Type: application/json; charset=utf-8');
+    private static function instance(): ResponseCore
+    {
+        if (self::$instance === null) {
+            self::$instance = new ResponseCore(
+                Config::app('urls.admin_url'),
+                Config::app('urls.base_url'),
+                __DIR__ . '/../admin/error-403.html'
+            );
+        }
 
-        echo json_encode(
-            $data,
-            JSON_UNESCAPED_UNICODE
-            | JSON_UNESCAPED_SLASHES
-        );
-
-        exit;
+        return self::$instance;
     }
 }

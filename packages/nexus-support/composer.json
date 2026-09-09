@@ -1,0 +1,21 @@
+{
+    "name": "fadyashraf-dev/nexus-support",
+    "description": "Framework-agnostic PHP utilities (Config, Database, Session, Validator, Repository, and more) extracted from the Nexus marketplace platform.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fady Ashraf"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "ext-pdo": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "FadyAshrafDev\\NexusSupport\\": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}

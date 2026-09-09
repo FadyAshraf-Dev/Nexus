@@ -2,51 +2,19 @@
 
 declare(strict_types=1);
 
-abstract class Repository
+use FadyAshrafDev\NexusSupport\Repository as RepositoryCore;
+
+/**
+ * App-level Repository: a non-namespaced alias for the package's
+ * abstract FadyAshrafDev\NexusSupport\Repository class.
+ *
+ * Repository is `extends`-ed directly by 12 app repositories
+ * (TokenRepository, NotificationRepository, CouponRepository, etc.)
+ * so it can't be a delegating facade like Config/Database - PHP has
+ * no way to "delegate" a class extension. This keeps the global
+ * `Repository` name every one of those 12 files already extends,
+ * while the actual logic lives in the portable package class.
+ */
+abstract class Repository extends RepositoryCore
 {
-    protected PDO $pdo;
-
-    public function __construct(PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
-
-    protected function prepare(
-        string $sql
-    ): PDOStatement
-    {
-        return $this->pdo->prepare($sql);
-    }
-
-    protected function query(
-        string $sql
-    ): PDOStatement
-    {
-        return $this->pdo->query($sql);
-    }
-
-    protected function lastInsertId(): int
-    {
-        return (int)$this->pdo->lastInsertId();
-    }
-
-    protected function beginTransaction(): bool
-    {
-        return $this->pdo->beginTransaction();
-    }
-
-    protected function commit(): bool
-    {
-        return $this->pdo->commit();
-    }
-
-    protected function rollBack(): bool
-    {
-        return $this->pdo->rollBack();
-    }
-
-    protected function inTransaction(): bool
-    {
-        return $this->pdo->inTransaction();
-    }
 }
