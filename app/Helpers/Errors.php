@@ -2,35 +2,47 @@
 
 declare(strict_types=1);
 
+use FadyAshrafDev\NexusSupport\ArraySessionStore;
+use FadyAshrafDev\NexusSupport\Errors as ErrorsCore;
+
+/**
+ * Static facade over FadyAshrafDev\NexusSupport\Errors.
+ *
+ * Every existing call site is untouched by this refactor. The
+ * package's Errors class is backed by ArraySessionStore, which
+ * reads/writes $_SESSION exactly as the original static class did.
+ */
 final class Errors
 {
+    private static ?ErrorsCore $instance = null;
+
     public static function set(array $errors): void
     {
-        $_SESSION['errors'] = $errors;
+        self::instance()->set($errors);
     }
 
-    public static function get(
-    string $key,
-    mixed $default = ''
-): mixed
+    public static function get(string $key, mixed $default = ''): mixed
     {
-        return $_SESSION['errors'][$key] ?? $default;
+        return self::instance()->get($key, $default);
     }
 
     public static function all(): array
     {
-        return $_SESSION['errors'] ?? [];
+        return self::instance()->all();
     }
 
-    public static function has(
-        string $key
-    ): bool
+    public static function has(string $key): bool
     {
-        return isset($_SESSION['errors'][$key]);
+        return self::instance()->has($key);
     }
 
     public static function clear(): void
     {
-        unset($_SESSION['errors']);
+        self::instance()->clear();
+    }
+
+    private static function instance(): ErrorsCore
+    {
+        return self::$instance ??= new ErrorsCore(new ArraySessionStore());
     }
 }

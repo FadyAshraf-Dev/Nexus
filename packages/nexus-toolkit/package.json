@@ -1,0 +1,30 @@
+{
+  "name": "@fadyashraf-dev/nexus-toolkit",
+  "version": "1.0.0",
+  "description": "Small framework-agnostic front-end utilities (Ajax, Dom, Money, Navigation, Renderer, Template) extracted from the Nexus marketplace admin panel.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FadyAshraf-Dev/Nexus.git",
+    "directory": "packages/nexus-toolkit"
+  },
+  "author": "Fady Ashraf",
+  "license": "MIT",
+  "keywords": [
+    "vanilla-js",
+    "dom",
+    "fetch",
+    "ajax",
+    "utilities"
+  ]
+}

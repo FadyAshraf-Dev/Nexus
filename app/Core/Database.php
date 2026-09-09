@@ -2,42 +2,37 @@
 
 declare(strict_types=1);
 
+use FadyAshrafDev\NexusSupport\Database as DatabaseCore;
+
+/**
+ * Static facade over FadyAshrafDev\NexusSupport\Database.
+ *
+ * Every existing call site in this app (Database::connection())
+ * is untouched by the option-2 refactor - this class still exposes
+ * exactly the same static API. The only change is that the actual
+ * connection logic now lives in the instantiable, dependency-free
+ * NexusSupport\Database class, which is what got extracted into
+ * the composer package.
+ *
+ * Deliberately does NOT require config/*.php itself - it reads
+ * through Config's own static facade so both facades always agree
+ * on the same loaded config, with a single source of truth.
+ */
 final class Database
 {
-    private static ?PDO $connection = null;
+    private static ?DatabaseCore $instance = null;
 
     public static function connection(): PDO
     {
-        if (self::$connection === null) {
-
-            $dsn = sprintf(
-                '%s:host=%s;dbname=%s;charset=%s',
-                Config::database('driver'),
-                Config::database('host'),
-                Config::database('dbname'),
-                Config::database('charset')
-            );
-
-            self::$connection = new PDO(
-                $dsn,
-                Config::database('username'),
-                Config::database('password'),
-                [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                    PDO::ATTR_EMULATE_PREPARES => false,
-                ]
-            );
-        }
-
-        return self::$connection;
+        return self::instance()->connection();
     }
 
-    private function __construct() {}
-    private function __clone() {}
-
-    public function __wakeup(): void
+    private static function instance(): DatabaseCore
     {
-        throw new LogicException('Cannot unserialize Database.');
+        if (self::$instance === null) {
+            self::$instance = new DatabaseCore(Config::coreInstance());
+        }
+
+        return self::$instance;
     }
 }
